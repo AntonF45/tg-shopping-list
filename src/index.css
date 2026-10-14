@@ -1,0 +1,308 @@
+:root {
+  /* Telegram Theme Variables Fallbacks */
+  --tg-bg-color: var(--tg-theme-bg-color, #ffffff);
+  --tg-text-color: var(--tg-theme-text-color, #000000);
+  --tg-hint-color: var(--tg-theme-hint-color, #999999);
+  --tg-link-color: var(--tg-theme-link-color, #2481cc);
+  --tg-button-color: var(--tg-theme-button-color, #2481cc);
+  --tg-button-text-color: var(--tg-theme-button-text-color, #ffffff);
+  --tg-secondary-bg-color: var(--tg-theme-secondary-bg-color, #f0f0f0);
+  
+  --danger-color: #ff3b30;
+  --success-color: #34c759;
+  --border-radius: 12px;
+  --spacing: 16px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  background-color: var(--tg-bg-color);
+  color: var(--tg-text-color);
+  line-height: 1.5;
+  overflow-x: hidden;
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: var(--spacing);
+}
+
+.app-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: var(--spacing);
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--tg-secondary-bg-color);
+}
+
+.app-header h1 {
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.item-count {
+  background: var(--tg-secondary-bg-color);
+  color: var(--tg-hint-color);
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* Form */
+.add-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.input-name, .input-qty, .input-category {
+  width: 100%;
+  padding: 14px;
+  border: 1px solid var(--tg-secondary-bg-color);
+  border-radius: var(--border-radius);
+  background: var(--tg-bg-color);
+  color: var(--tg-text-color);
+  font-size: 16px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.input-name:focus, .input-qty:focus, .input-category:focus {
+  border-color: var(--tg-button-color);
+}
+
+.form-row {
+  display: flex;
+  gap: 8px;
+}
+
+.input-qty {
+  flex: 1;
+}
+
+.input-category {
+  flex: 1;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23999999%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px top 50%;
+  background-size: 10px auto;
+}
+
+.btn-add {
+  width: 52px;
+  height: 52px;
+  border: none;
+  border-radius: var(--border-radius);
+  background: var(--tg-button-color);
+  color: var(--tg-button-text-color);
+  font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.btn-add:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* List */
+.item-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 80px; /* Space for footer */
+}
+
+.item-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: var(--tg-secondary-bg-color);
+  border-radius: var(--border-radius);
+  transition: opacity 0.2s;
+}
+
+.item-row.done {
+  opacity: 0.6;
+}
+
+.checkbox-container {
+  position: relative;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.checkbox-container input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.checkmark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 24px;
+  height: 24px;
+  background-color: transparent;
+  border: 2px solid var(--tg-hint-color);
+  border-radius: 6px;
+}
+
+.checkbox-container input:checked ~ .checkmark {
+  background-color: var(--success-color);
+  border-color: var(--success-color);
+}
+
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+  left: 7px;
+  top: 3px;
+  width: 6px;
+  height: 12px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.checkbox-container input:checked ~ .checkmark:after {
+  display: block;
+}
+
+.item-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+}
+
+.item-name {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.item-row.done .item-name {
+  text-decoration: line-through;
+  color: var(--tg-hint-color);
+}
+
+.item-qty {
+  font-size: 14px;
+  color: var(--tg-hint-color);
+  margin-top: 2px;
+}
+
+.btn-remove {
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: transparent;
+  color: var(--danger-color);
+  font-size: 18px;
+  cursor: pointer;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-remove:active {
+  background: rgba(255, 59, 48, 0.1);
+}
+
+.section-divider {
+  font-size: 13px;
+  text-transform: uppercase;
+  color: var(--tg-hint-color);
+  margin: 16px 0 8px 4px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.empty-state {
+  text-align: center;
+  color: var(--tg-hint-color);
+  padding: 40px 20px;
+  font-size: 16px;
+}
+
+/* Footer */
+.app-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--tg-bg-color);
+  padding: 16px;
+  border-top: 1px solid var(--tg-secondary-bg-color);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.actions-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.btn-share {
+  width: 100%;
+  padding: 16px;
+  border: none;
+  border-radius: var(--border-radius);
+  background: var(--tg-button-color);
+  color: var(--tg-button-text-color);
+  font-size: 17px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-share:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-clear {
+  width: 100%;
+  padding: 14px;
+  border: 1px solid var(--danger-color);
+  border-radius: var(--border-radius);
+  background: transparent;
+  color: var(--danger-color);
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.loading, .error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  font-size: 18px;
+  color: var(--tg-hint-color);
+}
