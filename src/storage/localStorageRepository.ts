@@ -1,4 +1,4 @@
-import { ShoppingList, ShoppingItem, AddItemInput, Category } from '../types/shopping';
+import { ShoppingList, ShoppingItem, AddItemInput } from '../types/shopping';
 import { ShoppingListRepository, ListStorage } from './types';
 
 const STORAGE_KEY = 'shopping_list_v1';

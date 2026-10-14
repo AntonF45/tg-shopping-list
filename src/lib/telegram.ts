@@ -1,3 +1,9 @@
+   declare global {
+     interface Window {
+       Telegram: any;
+     }
+   }
+
 export const initTelegram = () => {
   const tg = window.Telegram?.WebApp;
   if (tg) {
