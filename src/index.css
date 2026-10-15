@@ -1,16 +1,9 @@
+/* ========================================
+   MOSSFORGE DESIGN SYSTEM + TELEGRAM THEME
+   ======================================== */
+
 :root {
-  /* Mossforge Color System - Адаптировано под Telegram */
-  
-  /* Светлая тема (по умолчанию) */
-  --tg-bg-color: var(--tg-theme-bg-color, #F5F3EC);
-  --tg-text-color: var(--tg-theme-text-color, #1A2F23);
-  --tg-hint-color: var(--tg-theme-hint-color, #6B7F73);
-  --tg-link-color: var(--tg-theme-link-color, #8FD14F);
-  --tg-button-color: var(--tg-theme-button-color, #A8E063);
-  --tg-button-text-color: var(--tg-theme-button-text-color, #1A2F23);
-  --tg-secondary-bg-color: var(--tg-theme-secondary-bg-color, #E8E4DC);
-  
-  /* Mossforge акценты */
+  /* === Базовые Mossforge цвета (светлая тема по умолчанию) === */
   --moss-cream: #F5F3EC;
   --moss-cream-dark: #E8E4DC;
   --moss-lime: #A8E063;
@@ -19,7 +12,17 @@
   --moss-evergreen-light: #2D4A3E;
   --moss-sage: #6B7F73;
   
-  /* Тени и эффекты */
+  /* === Привязка к Telegram темам === */
+  /* Если Telegram даёт свой цвет — используем его, иначе наш Mossforge */
+  --tg-bg-color: var(--tg-theme-bg-color, var(--moss-cream));
+  --tg-text-color: var(--tg-theme-text-color, var(--moss-evergreen));
+  --tg-hint-color: var(--tg-theme-hint-color, var(--moss-sage));
+  --tg-link-color: var(--tg-theme-link-color, var(--moss-lime-dark));
+  --tg-button-color: var(--tg-theme-button-color, var(--moss-lime));
+  --tg-button-text-color: var(--tg-theme-button-text-color, var(--moss-evergreen));
+  --tg-secondary-bg-color: var(--tg-theme-secondary-bg-color, var(--moss-cream-dark));
+  
+  /* Эффекты */
   --moss-shadow: 0 4px 20px rgba(26, 47, 35, 0.08);
   --moss-shadow-hover: 0 8px 30px rgba(26, 47, 35, 0.12);
   --border-radius: 16px;
@@ -28,16 +31,8 @@
   --spacing: 16px;
 }
 
-/* Тёмная тема Telegram */
+/* === Тёмная тема: переопределяем только Mossforge-цвета === */
 [data-theme="dark"] {
-  --tg-bg-color: var(--tg-theme-bg-color, #1A2F23);
-  --tg-text-color: var(--tg-theme-text-color, #F5F3EC);
-  --tg-hint-color: var(--tg-theme-hint-color, #8FA396);
-  --tg-link-color: var(--tg-theme-link-color, #A8E063);
-  --tg-button-color: var(--tg-theme-button-color, #2D4A3E);
-  --tg-button-text-color: var(--tg-theme-button-text-color, #F5F3EC);
-  --tg-secondary-bg-color: var(--tg-theme-secondary-bg-color, #254035);
-  
   --moss-cream: #1A2F23;
   --moss-cream-dark: #254035;
   --moss-evergreen: #F5F3EC;
@@ -48,6 +43,7 @@
   --moss-shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.4);
 }
 
+/* === Базовые стили === */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -74,7 +70,7 @@ body {
   background: var(--moss-cream);
 }
 
-/* Header в стиле Mossforge */
+/* === Header === */
 .app-header {
   display: flex;
   align-items: center;
@@ -93,10 +89,6 @@ body {
   letter-spacing: -0.5px;
 }
 
-[data-theme="dark"] .app-header h1 {
-  color: var(--moss-evergreen);
-}
-
 .item-count {
   background: var(--moss-lime);
   color: var(--moss-evergreen);
@@ -107,7 +99,7 @@ body {
   font-family: 'SF Mono', 'Monaco', 'Inconsolata', monospace;
 }
 
-/* Форма добавления - Mossforge style */
+/* === Форма добавления === */
 .add-form {
   display: flex;
   flex-direction: column;
@@ -126,13 +118,6 @@ body {
   outline: none;
   transition: all 0.3s ease;
   box-shadow: var(--moss-shadow);
-}
-
-[data-theme="dark"] .input-name,
-[data-theme="dark"] .input-qty,
-[data-theme="dark"] .input-category {
-  color: var(--moss-evergreen);
-  border-color: var(--moss-evergreen-light);
 }
 
 .input-name:focus, .input-qty:focus, .input-category:focus {
@@ -156,6 +141,10 @@ body {
   background-repeat: no-repeat;
   background-position: right 16px top 50%;
   background-size: 12px auto;
+}
+
+[data-theme="dark"] .input-category {
+  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23F5F3EC%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
 }
 
 .btn-add {
@@ -191,7 +180,7 @@ body {
   transform: none;
 }
 
-/* Список товаров - Mossforge cards */
+/* === Список товаров === */
 .item-list {
   display: flex;
   flex-direction: column;
@@ -209,6 +198,7 @@ body {
   box-shadow: var(--moss-shadow);
   transition: all 0.3s ease;
   border: 2px solid transparent;
+  animation: fadeIn 0.3s ease;
 }
 
 .item-row:hover {
@@ -283,10 +273,6 @@ body {
   color: var(--moss-evergreen);
 }
 
-[data-theme="dark"] .item-name {
-  color: var(--moss-evergreen);
-}
-
 .item-row.done .item-name {
   text-decoration: line-through;
   color: var(--moss-sage);
@@ -340,7 +326,7 @@ body {
   border: 2px dashed var(--moss-cream-dark);
 }
 
-/* Footer и кнопки - Mossforge style */
+/* === Footer и кнопки === */
 .app-footer {
   position: fixed;
   bottom: 0;
@@ -352,6 +338,10 @@ body {
   max-width: 600px;
   margin: 0 auto;
   box-shadow: 0 -4px 20px rgba(26, 47, 35, 0.08);
+}
+
+[data-theme="dark"] .app-footer {
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
 }
 
 .actions-bar {
@@ -422,7 +412,7 @@ body {
   background: rgba(255, 107, 107, 0.05);
 }
 
-/* Loading и Error states */
+/* === Loading / Error === */
 .loading, .error {
   display: flex;
   align-items: center;
@@ -433,7 +423,7 @@ body {
   background: var(--moss-cream);
 }
 
-/* Анимации */
+/* === Анимации === */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -443,8 +433,4 @@ body {
     opacity: 1;
     transform: translateY(0);
   }
-}
-
-.item-row {
-  animation: fadeIn 0.3s ease;
 }
