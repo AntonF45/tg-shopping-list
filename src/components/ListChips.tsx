@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useLayoutEffect, useRef, useCallback } from 'react';
 import { ShoppingList } from '../types/shopping';
 import { triggerHaptic } from '../lib/telegram';
-import { useLongPress } from '../hooks/useLongPress';
 
 interface Props {
   lists: ShoppingList[];
@@ -42,20 +41,20 @@ export const ListChips: React.FC<Props> = ({
     setMenuBox(null);
   }, []);
 
-  // Закрытие меню по клику вне (только если клик НЕ по чипсу)
+  // Закрытие меню только по клику вне меню (не по чипсам)
   useEffect(() => {
     if (!menu) return;
 
     const onOutside = (e: PointerEvent) => {
       const target = e.target as Node;
       
-      // Если клик по чипсам — не закрываем (чипс сам решит)
-      if (chipsRowRef.current?.contains(target)) {
+      // Если клик по меню — не закрываем
+      if (menuRef.current?.contains(target)) {
         return;
       }
       
-      // Если клик по меню — не закрываем
-      if (menuRef.current?.contains(target)) {
+      // Если клик по чипсам — не закрываем (чипс сам решит)
+      if (chipsRowRef.current?.contains(target)) {
         return;
       }
       
@@ -65,7 +64,6 @@ export const ListChips: React.FC<Props> = ({
 
     const onScroll = () => closeMenu();
 
-    // Используем pointerdown для единообразия
     document.addEventListener('pointerdown', onOutside, { capture: true });
     window.addEventListener('resize', onScroll);
     window.addEventListener('scroll', onScroll, { passive: true });
@@ -86,13 +84,8 @@ export const ListChips: React.FC<Props> = ({
     const half = rect.width / 2;
     const vw = window.innerWidth;
 
-    // anchorX — это центр чипса, clamp для центра меню
     const clampedCenter = Math.min(Math.max(menu.anchorX, half + margin), vw - half - margin);
-    
-    // left — это левый край меню (центр - половина ширины)
     const left = clampedCenter - half;
-    
-    // arrowLeft — позиция стрелки относительно левого края меню
     const arrowLeft = half + (menu.anchorX - clampedCenter);
 
     setMenuBox({ left, arrowLeft });
@@ -153,7 +146,6 @@ export const ListChips: React.FC<Props> = ({
     }
   }, [handleCreate, handleRename]);
 
-  // Клик по чипсу: закрывает меню И переключает список
   const handleChipClick = useCallback((listId: string) => {
     closeMenu();
     onSelect(listId);
@@ -280,6 +272,7 @@ export const ListChips: React.FC<Props> = ({
   );
 };
 
+// ChipButton с собственной логикой long press (без хука)
 interface ChipButtonProps {
   list: ShoppingList;
   isActive: boolean;
@@ -289,23 +282,69 @@ interface ChipButtonProps {
 
 const ChipButton: React.FC<ChipButtonProps> = ({ list, isActive, onSelect, onLongPress }) => {
   const buttonRef = useRef<HTMLButtonElement>(null);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isLongPressRef = useRef(false);
+  const startPosRef = useRef<{ x: number; y: number } | null>(null);
 
-  const longPressHandlers = useLongPress({
-    onLongPress: () => {
+  const handlePointerDown = useCallback((e: React.PointerEvent) => {
+    isLongPressRef.current = false;
+    startPosRef.current = { x: e.clientX, y: e.clientY };
+
+    timerRef.current = setTimeout(() => {
+      isLongPressRef.current = true;
       if (buttonRef.current) {
         onLongPress(list.id, buttonRef.current.getBoundingClientRect());
       }
-    },
-    onClick: onSelect,
-    threshold: 500,
-  });
+    }, 500);
+  }, [list.id, onLongPress]);
+
+  const handlePointerMove = useCallback((e: React.PointerEvent) => {
+    if (!startPosRef.current) return;
+
+    const deltaX = Math.abs(e.clientX - startPosRef.current.x);
+    const deltaY = Math.abs(e.clientY - startPosRef.current.y);
+
+    if (deltaX > 10 || deltaY > 10) {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+        timerRef.current = null;
+      }
+      startPosRef.current = null;
+    }
+  }, []);
+
+  const handlePointerUp = useCallback(() => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+
+    // Если это НЕ было долгое нажатие — вызываем обычный клик
+    if (!isLongPressRef.current) {
+      onSelect();
+    }
+
+    isLongPressRef.current = false;
+    startPosRef.current = null;
+  }, [onSelect]);
+
+  const handlePointerLeave = useCallback(() => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+    startPosRef.current = null;
+  }, []);
 
   return (
     <button
       ref={buttonRef}
       className={`list-chip ${isActive ? 'active' : ''}`}
       type="button"
-      {...longPressHandlers}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      onPointerLeave={handlePointerLeave}
     >
       {list.title}
       {list.items.length > 0 && <span className="chip-count">{list.items.length}</span>}
