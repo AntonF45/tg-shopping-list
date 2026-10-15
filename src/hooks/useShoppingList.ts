@@ -6,19 +6,26 @@ import { triggerHaptic } from '../lib/telegram';
 
 export const useShoppingList = () => {
   const [list, setList] = useState<ShoppingList | null>(null);
+  const [allLists, setAllLists] = useState<ShoppingList[]>([]);
+  const [activeListId, setActiveListId] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    const load = async () => {
-      const data = await localStorageRepository.getList();
-      setList(data);
-      setIsLoading(false);
-      
-      const initialLength = await getInitialListLength();
-      logEvent('app_opened', { totalItems: initialLength });
-    };
-    load();
+  const loadData = useCallback(async () => {
+    const store = await localStorageRepository.getAllLists();
+    const activeList = await localStorageRepository.getActiveList();
+    
+    setAllLists(store.lists);
+    setActiveListId(store.activeListId);
+    setList(activeList);
+    setIsLoading(false);
+    
+    const initialLength = await getInitialListLength();
+    logEvent('app_opened', { totalItems: initialLength });
   }, []);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
 
   const addItem = useCallback(async (input: AddItemInput) => {
     if (!input.name.trim()) return;
@@ -27,6 +34,11 @@ export const useShoppingList = () => {
     const newItem = await localStorageRepository.addItem(input);
     
     setList(prev => prev ? { ...prev, items: [...prev.items, newItem] } : null);
+    setAllLists(prev => prev.map(l => 
+      l.id === activeListId 
+        ? { ...l, items: [...l.items, newItem] }
+        : l
+    ));
     triggerHaptic('light');
     
     logEvent(initialLength === 0 ? 'first_item_added' : 'item_added', {
@@ -34,47 +46,79 @@ export const useShoppingList = () => {
       category: input.category,
       totalItems: initialLength + 1
     });
-  }, [list?.items.length]);
+  }, [list?.items.length, activeListId]);
 
   const toggleItem = useCallback(async (id: string) => {
     const updatedItem = await localStorageRepository.toggleItem(id);
     setList(prev => {
       if (!prev) return null;
-      const newItems = prev.items.filter(i => i.id !== id).concat(updatedItem);
-      // Сортировка уже сделана в репозитории, но для реактивности обновляем массив
-      newItems.sort((a, b) => {
-        if (a.isDone === b.isDone) return b.createdAt - a.createdAt;
-        return a.isDone ? 1 : -1;
-      });
+      const newItems = prev.items.map(i => i.id === id ? updatedItem : i);
       return { ...prev, items: newItems };
     });
+    setAllLists(prev => prev.map(l => 
+      l.id === activeListId 
+        ? { ...l, items: l.items.map(i => i.id === id ? updatedItem : i) }
+        : l
+    ));
     triggerHaptic('medium');
     logEvent('item_marked_done');
-  }, []);
+  }, [activeListId]);
 
   const removeItem = useCallback(async (id: string) => {
     await localStorageRepository.removeItem(id);
     setList(prev => prev ? { ...prev, items: prev.items.filter(i => i.id !== id) } : null);
+    setAllLists(prev => prev.map(l => 
+      l.id === activeListId 
+        ? { ...l, items: l.items.filter(i => i.id !== id) }
+        : l
+    ));
     triggerHaptic('light');
     logEvent('item_removed');
-  }, []);
+  }, [activeListId]);
 
   const clearDone = useCallback(async () => {
     if (!window.confirm('Удалить все купленные товары?')) return;
     await localStorageRepository.clearDone();
     setList(prev => prev ? { ...prev, items: prev.items.filter(i => !i.isDone) } : null);
+    setAllLists(prev => prev.map(l => 
+      l.id === activeListId 
+        ? { ...l, items: l.items.filter(i => !i.isDone) }
+        : l
+    ));
     triggerHaptic('heavy');
     logEvent('list_cleared');
+  }, [activeListId]);
+
+  const setActiveList = useCallback(async (id: string) => {
+    await localStorageRepository.setActiveList(id);
+    const store = await localStorageRepository.getAllLists();
+    const newList = store.lists.find(l => l.id === id);
+    if (newList) {
+      setList(newList);
+      setActiveListId(id);
+      triggerHaptic('light');
+    }
   }, []);
 
-    const updateQty = useCallback(async (id: string, qty: string) => {
-    const updatedItem = await localStorageRepository.updateQty(id, qty);
-    setList(prev => {
-      if (!prev) return null;
-      const newItems = prev.items.map(i => i.id === id ? updatedItem : i);
-      return { ...prev, items: newItems };
-    });
+  const createList = useCallback(async (title: string) => {
+    const newList = await localStorageRepository.createList(title);
+    const store = await localStorageRepository.getAllLists();
+    setAllLists(store.lists);
+    setList(newList);
+    setActiveListId(newList.id);
+    logEvent('list_created');
   }, []);
 
-    return { list, isLoading, addItem, toggleItem, removeItem, clearDone, updateQty };
+  return { 
+    list, 
+    allLists, 
+    activeListId,
+    isLoading, 
+    addItem, 
+    toggleItem, 
+    removeItem, 
+    clearDone,
+    setActiveList,
+    createList
+  };
 };

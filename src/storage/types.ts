@@ -1,16 +1,22 @@
-import { ShoppingList, ShoppingItem, AddItemInput } from '../types/shopping';
+import { ShoppingList, ShoppingItem, AddItemInput, ShoppingListsStore } from '../types/shopping';
 
 export interface ListStorage {
-  getList(): Promise<ShoppingList>;
-  saveList(list: ShoppingList): Promise<void>;
+  getAllLists(): Promise<ShoppingListsStore>;
+  saveAllLists(store: ShoppingListsStore): Promise<void>;
+  setActiveListId(id: string): Promise<void>;
   clear(): Promise<void>;
 }
 
 export interface ShoppingListRepository {
-  getList(): Promise<ShoppingList>;
+  getAllLists(): Promise<ShoppingListsStore>;
+  getActiveList(): Promise<ShoppingList>;
+  setActiveList(id: string): Promise<void>;
+  createList(title: string): Promise<ShoppingList>;
+  deleteList(id: string): Promise<void>;
+  renameList(id: string, newTitle: string): Promise<void>;
   addItem(input: AddItemInput): Promise<ShoppingItem>;
   toggleItem(id: string): Promise<ShoppingItem>;
   removeItem(id: string): Promise<void>;
   clearDone(): Promise<void>;
-  updateQty(id: string, qty: string): Promise<ShoppingItem>; // ← ВОТ ЭТА СТРОКА БЫЛА ПРОПУЩЕНА
+  updateQty(id: string, qty: string): Promise<ShoppingItem>;
 }

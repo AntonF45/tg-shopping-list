@@ -17,6 +17,13 @@ export interface ShoppingList {
   updatedAt: number;
 }
 
+// НОВЫЙ ТИП: хранилище всех списков
+export interface ShoppingListsStore {
+  version: number;
+  activeListId: string;
+  lists: ShoppingList[];
+}
+
 export interface AddItemInput {
   name: string;
   qty?: string;
