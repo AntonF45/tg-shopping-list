@@ -12,4 +12,5 @@ export interface ShoppingListRepository {
   toggleItem(id: string): Promise<ShoppingItem>;
   removeItem(id: string): Promise<void>;
   clearDone(): Promise<void>;
+  updateQty(id: string, qty: string): Promise<ShoppingItem>; // ← ВОТ ЭТА СТРОКА БЫЛА ПРОПУЩЕНА
 }
