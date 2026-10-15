@@ -41,7 +41,7 @@ export const ListChips: React.FC<Props> = ({
     setMenuBox(null);
   }, []);
 
-  // Закрытие меню только по клику вне меню (не по чипсам)
+    // Закрытие меню по клику вне и по скроллу
   useEffect(() => {
     if (!menu) return;
 
@@ -62,16 +62,32 @@ export const ListChips: React.FC<Props> = ({
       closeMenu();
     };
 
-    const onScroll = () => closeMenu();
+    const onWindowScroll = () => closeMenu();
+
+    // Закрытие меню при горизонтальном скролле чипсов
+    const chipsRow = chipsRowRef.current;
+    const onChipsScroll = () => {
+      console.log('[UI] Меню закрыто: скролл чипсов');
+      closeMenu();
+    };
 
     document.addEventListener('pointerdown', onOutside, { capture: true });
-    window.addEventListener('resize', onScroll);
-    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onWindowScroll);
+    window.addEventListener('scroll', onWindowScroll, { passive: true });
+    
+    // Слушаем скролл контейнера чипсов
+    if (chipsRow) {
+      chipsRow.addEventListener('scroll', onChipsScroll, { passive: true });
+    }
 
     return () => {
       document.removeEventListener('pointerdown', onOutside, { capture: true });
-      window.removeEventListener('resize', onScroll);
-      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onWindowScroll);
+      window.removeEventListener('scroll', onWindowScroll);
+      
+      if (chipsRow) {
+        chipsRow.removeEventListener('scroll', onChipsScroll);
+      }
     };
   }, [menu, closeMenu]);
 
