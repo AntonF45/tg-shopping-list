@@ -1,15 +1,11 @@
 import React from 'react';
 import { useShoppingList } from './hooks/useShoppingList';
-import { useTelegramTheme } from './hooks/useTelegramTheme';
 import { AddItemForm } from './components/AddItemForm';
 import { ItemList } from './components/ItemList';
 import { ShareButton } from './components/ShareButton';
 
 const App: React.FC = () => {
   const { list, isLoading, addItem, toggleItem, removeItem, clearDone } = useShoppingList();
-  
-  // Этот хук заставляет React перерисоваться при смене темы
-  useTelegramTheme();
 
   if (isLoading) {
     return <div className="loading">Загрузка...</div>;
