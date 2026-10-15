@@ -4,6 +4,7 @@ import App from './App';
 import { initTelegram } from './lib/telegram';
 import './index.css';
 
+// Инициализируем Telegram до рендера React
 initTelegram();
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
