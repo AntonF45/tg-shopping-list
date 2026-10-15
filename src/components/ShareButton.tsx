@@ -18,7 +18,7 @@ export const ShareButton: React.FC<Props> = ({ items, onClearDone }) => {
           onClick={() => shareList(items)}
         >
           <span className="btn-icon"></span>
-          <span>Отправить</span>
+          <span>Отправить в чат</span>
         </button>
       )}
       

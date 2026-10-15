@@ -391,7 +391,7 @@ body {
   align-items: center;
   justify-content: center;
   transition: all 0.2s ease;
-  opacity: 0.5; /* Всегда видимый, но приглушённый */
+  opacity: 0.5;
   flex-shrink: 0;
   padding: 0;
   line-height: 1;
@@ -448,22 +448,41 @@ body {
   border: 2px dashed var(--moss-cream-dark);
 }
 
-/* === Плавающие кнопки-острова === */
+/* === Контейнер приложения === */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh; /* Используем dvh для лучшей поддержки мобильных */
+  max-width: 600px;
+  margin: 0 auto;
+  padding: var(--spacing);
+  padding-bottom: 120px; /* Место для кнопок внизу */
+  background: var(--moss-cream);
+  transition: background-color 0.3s ease;
+  position: relative; /* Важно для absolute позиционирования кнопок */
+}
+
+/* ... (остальные стили формы и чек-листа остаются без изменений) ... */
+
+/* === Кнопки-острова внизу (НЕ поднимаются с клавиатурой) === */
 .floating-actions {
-  position: fixed;
-  bottom: 20px;
+  position: absolute; /* Было: fixed */
+  bottom: 24px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
   gap: 12px;
-  z-index: 100;
-  transition: bottom 0.3s ease;
+  width: calc(100% - 32px);
+  max-width: 568px;
+  z-index: 10;
+  transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
 .btn-share-island,
 .btn-clear-island {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   padding: 14px 24px;
   border: none;
@@ -473,6 +492,7 @@ body {
   cursor: pointer;
   box-shadow: var(--moss-shadow-hover);
   transition: all 0.3s ease;
+  flex: 1; /* Кнопки делят пространство поровну */
 }
 
 .btn-share-island {
@@ -486,23 +506,29 @@ body {
 }
 
 .btn-share-island:active {
-  transform: translateY(0);
+  transform: translateY(0) scale(0.98);
 }
 
 .btn-clear-island {
   background: var(--moss-cream-dark);
   color: var(--moss-sage);
   border: 2px solid var(--moss-cream-dark);
+  flex: 0 0 auto; /* Кнопка очистки не растягивается, занимает место по контенту */
 }
 
 .btn-clear-island:hover {
-  border-color: #FF6B6B;
-  color: #FF6B6B;
-  background: rgba(255, 107, 107, 0.05);
+  border-color: #e74c3c;
+  color: #e74c3c;
+  background: rgba(231, 76, 60, 0.05);
+}
+
+.btn-clear-island:active {
+  transform: scale(0.98);
 }
 
 .btn-icon {
   font-size: 18px;
+  line-height: 1;
 }
 
 /* === Loading / Error === */
