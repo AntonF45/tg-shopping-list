@@ -174,59 +174,119 @@ body {
   background: var(--moss-sage);
 }
 
-.qty-controls {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 0 8px;
+.qty-label {
+  font-size: 13px;
+  color: var(--moss-sage);
+  text-align: center;
+  font-weight: 500;
+  margin-top: -8px;
 }
 
-.btn-qty {
+.qty-counter {
+  display: flex;
+  align-items: center;
+  max-width: 200px;
+  margin: 0 auto;
+  box-shadow: var(--moss-shadow);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.btn-counter {
   width: 44px;
   height: 44px;
   border: 2px solid var(--moss-cream-dark);
-  border-radius: 50%;
   background: var(--moss-cream);
   color: var(--moss-evergreen);
-  font-size: 20px;
-  font-weight: 700;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
 }
 
-.btn-qty:hover {
+.btn-counter-left {
+  border-right: none;
+  border-radius: 12px 0 0 12px;
+}
+
+.btn-counter-right {
+  border-left: none;
+  border-radius: 0 12px 12px 0;
+}
+
+.btn-counter:hover {
+  background: var(--moss-lime);
   border-color: var(--moss-lime);
-  background: rgba(168, 224, 99, 0.1);
+  color: var(--moss-evergreen);
   transform: scale(1.05);
 }
 
-.btn-qty:active {
+.btn-counter:active {
   transform: scale(0.95);
+  background: var(--moss-lime-dark);
 }
 
-.input-qty {
-  flex: 1;
-  padding: 12px;
-  border: none;
+.btn-counter svg {
+  transition: transform 0.2s ease;
+}
+
+.btn-counter:active svg {
+  transform: scale(0.9);
+}
+
+.input-counter {
+  width: 80px;
+  height: 44px;
+  border-top: 2px solid var(--moss-cream-dark);
   border-bottom: 2px solid var(--moss-cream-dark);
-  background: transparent;
+  border-left: none;
+  border-right: none;
+  background: var(--moss-cream);
   color: var(--moss-evergreen);
   font-size: 16px;
   text-align: center;
   outline: none;
-  transition: border-color 0.3s ease;
   font-family: 'SF Mono', 'Monaco', monospace;
+  font-weight: 600;
+  transition: all 0.2s ease;
 }
 
-.input-qty:focus {
-  border-bottom-color: var(--moss-lime);
+.input-counter:focus {
+  background: rgba(168, 224, 99, 0.1);
 }
 
-.input-qty::placeholder {
+.input-counter::placeholder {
   color: var(--moss-sage);
+  font-size: 14px;
+}
+
+/* Адаптация для тёмной темы */
+[data-theme="dark"] .qty-counter {
+  box-shadow: var(--moss-shadow);
+}
+
+[data-theme="dark"] .btn-counter {
+  background: var(--moss-cream-dark);
+  border-color: var(--moss-evergreen-light);
+  color: var(--moss-evergreen);
+}
+
+[data-theme="dark"] .btn-counter:hover {
+  background: var(--moss-lime);
+  border-color: var(--moss-lime);
+  color: var(--moss-evergreen);
+}
+
+[data-theme="dark"] .input-counter {
+  background: var(--moss-cream-dark);
+  border-color: var(--moss-evergreen-light);
+  color: var(--moss-evergreen);
+}
+
+[data-theme="dark"] .input-counter:focus {
+  background: rgba(168, 224, 99, 0.15);
 }
 
 /* === Checklist стиль для списка товаров === */

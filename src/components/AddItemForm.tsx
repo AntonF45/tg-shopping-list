@@ -23,7 +23,7 @@ export const AddItemForm: React.FC<Props> = ({ onAdd }) => {
 
   const decrementQty = () => {
     const num = parseInt(qty) || 0;
-    if (num > 0) {
+    if (num > 1) {
       setQty((num - 1).toString());
     } else {
       setQty('');
@@ -54,9 +54,17 @@ export const AddItemForm: React.FC<Props> = ({ onAdd }) => {
         </button>
       </div>
       
-      <div className="qty-controls">
-        <button type="button" className="btn-qty" onClick={decrementQty}>
-          −
+      <div className="qty-label">Количество</div>
+      
+      <div className="qty-counter">
+        <button 
+          type="button" 
+          className="btn-counter btn-counter-left" 
+          onClick={decrementQty}
+        >
+          <svg width="12" height="12" viewBox="0 0 18 2" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M1 1h16"></path>
+          </svg>
         </button>
         <input
           type="text"
@@ -65,10 +73,16 @@ export const AddItemForm: React.FC<Props> = ({ onAdd }) => {
           placeholder="Кол-во"
           value={qty}
           onChange={handleQtyChange}
-          className="input-qty"
+          className="input-counter"
         />
-        <button type="button" className="btn-qty" onClick={incrementQty}>
-          +
+        <button 
+          type="button" 
+          className="btn-counter btn-counter-right" 
+          onClick={incrementQty}
+        >
+          <svg width="12" height="12" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M9 1v16M1 9h16"></path>
+          </svg>
         </button>
       </div>
     </form>
