@@ -1,187 +1,88 @@
-/* ========================================
-   MOSSFORGE DESIGN SYSTEM + TELEGRAM THEME
-   ======================================== */
-
-:root {
-  /* === Базовые Mossforge цвета (СВЕТЛАЯ тема по умолчанию) === */
-  --moss-cream: #F5F3EC;
-  --moss-cream-dark: #E8E4DC;
-  --moss-lime: #A8E063;
-  --moss-lime-dark: #8FD14F;
-  --moss-evergreen: #1A2F23;
-  --moss-evergreen-light: #2D4A3E;
-  --moss-sage: #6B7F73;
-  
-  /* === Привязка к Telegram темам === */
-  --tg-bg-color: var(--tg-theme-bg-color, var(--moss-cream));
-  --tg-text-color: var(--tg-theme-text-color, var(--moss-evergreen));
-  --tg-hint-color: var(--tg-theme-hint-color, var(--moss-sage));
-  --tg-link-color: var(--tg-theme-link-color, var(--moss-lime-dark));
-  --tg-button-color: var(--tg-theme-button-color, var(--moss-lime));
-  --tg-button-text-color: var(--tg-theme-button-text-color, var(--moss-evergreen));
-  --tg-secondary-bg-color: var(--tg-theme-secondary-bg-color, var(--moss-cream-dark));
-  
-  /* Эффекты */
-  --moss-shadow: 0 4px 20px rgba(26, 47, 35, 0.08);
-  --moss-shadow-hover: 0 8px 30px rgba(26, 47, 35, 0.12);
-  --border-radius: 16px;
-  --border-radius-sm: 8px;
-  --border-radius-pill: 50px;
-  --spacing: 16px;
-}
-
-/* === ТЁМНАЯ тема === */
-[data-theme="dark"] {
-  --moss-cream: #1A2F23;
-  --moss-cream-dark: #254035;
-  --moss-evergreen: #F5F3EC;
-  --moss-evergreen-light: #E8E4DC;
-  --moss-sage: #8FA396;
-  
-  --moss-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-  --moss-shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.4);
-}
-
-/* === Базовые стили === */
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  -webkit-tap-highlight-color: transparent;
-}
-
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  background-color: var(--tg-bg-color);
-  color: var(--tg-text-color);
-  line-height: 1.5;
-  overflow-x: hidden;
-  transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-.app-container {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  max-width: 600px;
-  margin: 0 auto;
-  padding: var(--spacing);
-  padding-bottom: 120px;
-  background: var(--moss-cream);
-  transition: background-color 0.3s ease;
-}
-
-/* === Header === */
-.app-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 24px;
-  padding: 20px;
-  background: var(--moss-cream-dark);
-  border-radius: var(--border-radius);
-  box-shadow: var(--moss-shadow);
-  transition: background-color 0.3s ease;
-}
-
-.app-header h1 {
-  font-size: 28px;
-  font-weight: 700;
-  color: var(--moss-evergreen);
-  letter-spacing: -0.5px;
-  transition: color 0.3s ease;
-}
-
-.item-count {
-  background: var(--moss-lime);
-  color: var(--moss-evergreen);
-  padding: 6px 14px;
-  border-radius: var(--border-radius-pill);
-  font-size: 14px;
-  font-weight: 700;
-  font-family: 'SF Mono', 'Monaco', 'Inconsolata', monospace;
-}
-
 /* === Форма добавления === */
 .add-form {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
   margin-bottom: 24px;
 }
 
-.input-row {
+.input-wrapper {
   display: flex;
-  gap: 8px;
   align-items: center;
+  background: var(--moss-cream);
+  border-radius: 50px;
+  padding: 6px;
+  box-shadow: var(--moss-shadow);
+  transition: all 0.3s ease;
+  border: 2px solid var(--moss-cream-dark);
+}
+
+.input-wrapper:focus-within {
+  border-color: var(--moss-lime);
+  box-shadow: var(--moss-shadow-hover);
 }
 
 .input-name {
   flex: 1;
-  padding: 16px 20px;
+  padding: 14px 20px;
   border: none;
-  border-bottom: 2px solid var(--moss-cream-dark);
   background: transparent;
   color: var(--moss-evergreen);
   font-size: 16px;
   outline: none;
-  transition: border-color 0.3s ease;
-}
-
-.input-name:focus {
-  border-bottom-color: var(--moss-lime);
+  font-weight: 500;
 }
 
 .input-name::placeholder {
   color: var(--moss-sage);
 }
 
-.btn-add-plus {
+.btn-add-circle {
   width: 48px;
   height: 48px;
   border: none;
   border-radius: 50%;
-  background: var(--moss-lime);
-  color: var(--moss-evergreen);
-  font-size: 24px;
-  font-weight: 700;
+  background: var(--moss-evergreen);
+  color: var(--moss-cream);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
   transition: all 0.3s ease;
-  box-shadow: var(--moss-shadow);
+  box-shadow: 0 4px 12px rgba(26, 47, 35, 0.2);
 }
 
-.btn-add-plus:hover {
+.btn-add-circle:hover {
+  background: var(--moss-lime);
+  color: var(--moss-evergreen);
   transform: scale(1.05);
-  box-shadow: var(--moss-shadow-hover);
 }
 
-.btn-add-plus:active {
+.btn-add-circle:active {
   transform: scale(0.95);
 }
 
-.btn-add-plus:disabled {
+.btn-add-circle:disabled {
   opacity: 0.4;
   cursor: not-allowed;
   transform: none;
+  background: var(--moss-sage);
 }
 
-.qty-row {
+.qty-controls {
   display: flex;
-  gap: 8px;
   align-items: center;
+  gap: 12px;
   padding: 0 8px;
 }
 
 .btn-qty {
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   border: 2px solid var(--moss-cream-dark);
   border-radius: 50%;
-  background: transparent;
+  background: var(--moss-cream);
   color: var(--moss-evergreen);
   font-size: 20px;
   font-weight: 700;
@@ -195,6 +96,7 @@ body {
 .btn-qty:hover {
   border-color: var(--moss-lime);
   background: rgba(168, 224, 99, 0.1);
+  transform: scale(1.05);
 }
 
 .btn-qty:active {
@@ -221,249 +123,4 @@ body {
 
 .input-qty::placeholder {
   color: var(--moss-sage);
-}
-
-/* === Checklist стиль для списка товаров === */
-.item-list {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  margin-bottom: 20px;
-}
-
-.checklist-item {
-  display: grid;
-  grid-template-columns: 30px auto 40px;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
-  background: var(--moss-cream);
-  border-radius: var(--border-radius-sm);
-  box-shadow: var(--moss-shadow);
-  transition: all 0.3s ease;
-}
-
-.checklist-item input[type="checkbox"] {
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  position: relative;
-  height: 20px;
-  width: 20px;
-  outline: none;
-  border: 2px solid var(--moss-sage);
-  border-radius: 4px;
-  margin: 0;
-  cursor: pointer;
-  background: var(--moss-cream);
-  transition: all 0.3s ease;
-}
-
-.checklist-item input[type="checkbox"]::before,
-.checklist-item input[type="checkbox"]::after {
-  content: "";
-  position: absolute;
-  height: 2px;
-  top: 50%;
-  background: var(--moss-lime);
-  border-radius: 2px;
-  transition: all 0.3s ease;
-}
-
-.checklist-item input[type="checkbox"]::before {
-  width: 0;
-  right: 50%;
-  transform-origin: right bottom;
-  transform: translateY(-50%) rotate(0);
-}
-
-.checklist-item input[type="checkbox"]::after {
-  width: 0;
-  left: 50%;
-  transform-origin: left bottom;
-  transform: translateY(-50%) rotate(0);
-}
-
-.checklist-item input[type="checkbox"]:checked {
-  border-color: var(--moss-lime);
-  background: var(--moss-lime);
-}
-
-.checklist-item input[type="checkbox"]:checked::before {
-  animation: check-01 0.4s ease forwards;
-}
-
-.checklist-item input[type="checkbox"]:checked::after {
-  animation: check-02 0.4s ease forwards;
-}
-
-@keyframes check-01 {
-  0% {
-    width: 4px;
-    transform: translateY(-50%) rotate(0);
-  }
-  50% {
-    width: 0;
-    transform: translateY(-50%) rotate(0);
-  }
-  51% {
-    width: 0;
-    transform: translateY(-50%) rotate(45deg);
-  }
-  100% {
-    width: 6px;
-    transform: translateY(-50%) rotate(45deg);
-  }
-}
-
-@keyframes check-02 {
-  0% {
-    width: 4px;
-    transform: translateY(-50%) rotate(0);
-  }
-  50% {
-    width: 0;
-    transform: translateY(-50%) rotate(0);
-  }
-  51% {
-    width: 0;
-    transform: translateY(-50%) rotate(-45deg);
-  }
-  100% {
-    width: 12px;
-    transform: translateY(-50%) rotate(-45deg);
-  }
-}
-
-.item-label {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.item-name {
-  font-size: 16px;
-  font-weight: 500;
-  color: var(--moss-evergreen);
-  transition: all 0.3s ease;
-}
-
-.item-qty {
-  font-size: 14px;
-  color: var(--moss-sage);
-  font-family: 'SF Mono', 'Monaco', monospace;
-  transition: color 0.3s ease;
-}
-
-.checklist-item input[type="checkbox"]:checked + .item-label .item-name {
-  text-decoration: line-through;
-  color: var(--moss-sage);
-}
-
-.checklist-item input[type="checkbox"]:checked + .item-label .item-qty {
-  color: var(--moss-sage);
-  opacity: 0.6;
-}
-
-.btn-remove-small {
-  width: 32px;
-  height: 32px;
-  border: none;
-  background: transparent;
-  color: var(--moss-sage);
-  font-size: 16px;
-  cursor: pointer;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s ease;
-  opacity: 0.5;
-}
-
-.btn-remove-small:hover {
-  opacity: 1;
-  color: #FF6B6B;
-  background: rgba(255, 107, 107, 0.1);
-}
-
-/* === Пустое состояние === */
-.empty-state {
-  text-align: center;
-  color: var(--moss-sage);
-  padding: 60px 20px;
-  font-size: 16px;
-  background: var(--moss-cream-dark);
-  border-radius: var(--border-radius);
-  border: 2px dashed var(--moss-cream-dark);
-}
-
-/* === Плавающие кнопки-острова === */
-.floating-actions {
-  position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 12px;
-  z-index: 100;
-  transition: bottom 0.3s ease;
-}
-
-.btn-share-island,
-.btn-clear-island {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 14px 24px;
-  border: none;
-  border-radius: var(--border-radius-pill);
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  box-shadow: var(--moss-shadow-hover);
-  transition: all 0.3s ease;
-}
-
-.btn-share-island {
-  background: var(--moss-lime);
-  color: var(--moss-evergreen);
-}
-
-.btn-share-island:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--moss-shadow-hover);
-}
-
-.btn-share-island:active {
-  transform: translateY(0);
-}
-
-.btn-clear-island {
-  background: var(--moss-cream-dark);
-  color: var(--moss-sage);
-  border: 2px solid var(--moss-cream-dark);
-}
-
-.btn-clear-island:hover {
-  border-color: #FF6B6B;
-  color: #FF6B6B;
-  background: rgba(255, 107, 107, 0.05);
-}
-
-.btn-icon {
-  font-size: 18px;
-}
-
-/* === Loading / Error === */
-.loading, .error {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-  font-size: 18px;
-  color: var(--moss-sage);
-  background: var(--moss-cream);
 }
