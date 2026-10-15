@@ -3,8 +3,8 @@ import { useRef, useCallback } from 'react';
 interface UseLongPressOptions {
   onLongPress: () => void;
   onClick?: () => void;
-  threshold?: number; // мс
-  moveThreshold?: number; // пиксели
+  threshold?: number;
+  moveThreshold?: number;
 }
 
 export const useLongPress = ({
@@ -18,9 +18,9 @@ export const useLongPress = ({
   const startPosRef = useRef<{ x: number; y: number } | null>(null);
 
   const start = useCallback((e: React.MouseEvent | React.TouchEvent) => {
+    // Всегда сбрасываем состояние при новом нажатии
     isLongPressRef.current = false;
     
-    // Запоминаем начальную позицию
     if ('touches' in e) {
       startPosRef.current = {
         x: e.touches[0].clientX,
@@ -51,7 +51,6 @@ export const useLongPress = ({
     const deltaX = Math.abs(currentX - startPosRef.current.x);
     const deltaY = Math.abs(currentY - startPosRef.current.y);
 
-    // Если палец сдвинулся больше порога — это скролл, отменяем long press
     if (deltaX > moveThreshold || deltaY > moveThreshold) {
       if (timerRef.current) {
         clearTimeout(timerRef.current);
@@ -66,9 +65,14 @@ export const useLongPress = ({
       clearTimeout(timerRef.current);
       timerRef.current = null;
     }
+    
+    // Вызываем onClick только если это не был long press
     if (!isLongPressRef.current && onClick) {
       onClick();
     }
+    
+    // Сбрасываем все состояния
+    isLongPressRef.current = false;
     startPosRef.current = null;
   }, [onClick]);
 
