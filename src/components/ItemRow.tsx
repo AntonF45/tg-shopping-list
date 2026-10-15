@@ -9,6 +9,26 @@ interface Props {
 }
 
 export const ItemRow: React.FC<Props> = ({ item, onToggle, onRemove }) => {
+  const handleRemove = () => {
+    const tg = window.Telegram?.WebApp;
+    
+    // Используем нативный диалог Telegram, если доступен
+    if (tg?.showConfirm) {
+      tg.showConfirm(`Удалить "${item.name}"?`, (confirmed: boolean) => {
+        if (confirmed) {
+          triggerHaptic('medium');
+          onRemove(item.id);
+        }
+      });
+    } else {
+      // Фоллбэк для обычного браузера
+      if (window.confirm(`Удалить "${item.name}"?`)) {
+        triggerHaptic('medium');
+        onRemove(item.id);
+      }
+    }
+  };
+
   return (
     <div className="checklist-item">
       <input
@@ -27,13 +47,11 @@ export const ItemRow: React.FC<Props> = ({ item, onToggle, onRemove }) => {
       </label>
       <button 
         className="btn-remove-item" 
-        onClick={() => {
-          triggerHaptic('light');
-          onRemove(item.id);
-        }}
+        onClick={handleRemove}
         aria-label="Удалить"
+        type="button"
       >
-        
+        ✕
       </button>
     </div>
   );

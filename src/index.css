@@ -324,19 +324,30 @@ body {
   border: none;
   background: transparent;
   color: var(--moss-sage);
-  font-size: 18px;
+  font-size: 16px;
   cursor: pointer;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.3s ease;
-  opacity: 0;
+  transition: all 0.2s ease;
+  opacity: 0.5; /* Всегда видимый, но приглушённый */
   flex-shrink: 0;
+  padding: 0;
+  line-height: 1;
 }
 
-.checklist-item:hover .btn-remove-item {
+.btn-remove-item:hover {
   opacity: 1;
+  background: rgba(231, 76, 60, 0.1);
+  color: #e74c3c;
+  transform: scale(1.1);
+}
+
+.btn-remove-item:active {
+  transform: scale(0.9);
+  background: rgba(231, 76, 60, 0.15);
+  color: #e74c3c;
 }
 
 .btn-remove-item:hover {
