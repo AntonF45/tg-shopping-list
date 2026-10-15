@@ -580,22 +580,42 @@ body {
 }
 
 /* === Чипсы списков === */
-.list-chips-container {
+.list-chips-wrapper {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--moss-cream);
+  transition: all 0.3s ease;
   margin-bottom: 16px;
+}
+
+.list-chips-wrapper.scrolled {
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.list-chips-container {
   padding: 0 4px;
+  transition: all 0.3s ease;
 }
 
 .list-chips-scroll {
   display: flex;
   gap: 8px;
   overflow-x: auto;
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE/Edge */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
   padding: 4px 0;
+  align-items: center;
 }
 
 .list-chips-scroll::-webkit-scrollbar {
-  display: none; /* Chrome/Safari */
+  display: none;
+}
+
+.chip-wrapper {
+  position: relative;
+  flex-shrink: 0;
 }
 
 .list-chip {
@@ -611,13 +631,14 @@ body {
   display: flex;
   align-items: center;
   gap: 6px;
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   white-space: nowrap;
 }
 
 .list-chip:hover {
   border-color: var(--moss-lime);
   color: var(--moss-evergreen);
+  transform: translateY(-1px);
 }
 
 .list-chip:active {
@@ -628,6 +649,8 @@ body {
   background: var(--moss-evergreen);
   color: var(--moss-cream);
   border-color: var(--moss-evergreen);
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(26, 47, 35, 0.2);
 }
 
 [data-theme="dark"] .list-chip.active {
@@ -652,6 +675,49 @@ body {
   background: rgba(0, 0, 0, 0.15);
 }
 
+.chip-actions {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: all 0.2s ease;
+  pointer-events: none;
+}
+
+.chip-wrapper:hover .chip-actions {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.chip-action-btn {
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: 50%;
+  background: var(--moss-cream);
+  color: var(--moss-sage);
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s ease;
+}
+
+.chip-action-btn:hover {
+  transform: scale(1.1);
+}
+
+.chip-action-delete:hover {
+  background: #e74c3c;
+  color: white;
+}
+
 .list-chip-add {
   width: 36px;
   height: 36px;
@@ -674,6 +740,63 @@ body {
   font-weight: 600;
   outline: none;
   width: 120px;
+}
+
+/* === Анимированный заголовок при скролле === */
+.scrolled-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 12px 20px;
+  background: var(--moss-cream);
+  border-bottom: 2px solid var(--moss-cream-dark);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 100;
+  animation: slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(26, 47, 35, 0.1);
+}
+
+[data-theme="dark"] .scrolled-header {
+  background: var(--moss-cream);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.scrolled-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--moss-evergreen);
+  letter-spacing: -0.5px;
+}
+
+.scrolled-count {
+  background: var(--moss-lime);
+  color: var(--moss-evergreen);
+  padding: 4px 12px;
+  border-radius: 50px;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: 'SF Mono', 'Monaco', monospace;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Адаптация для тёмной темы */
+[data-theme="dark"] .list-chips-wrapper {
+  background: var(--moss-cream);
 }
 
 /* === Loading / Error === */

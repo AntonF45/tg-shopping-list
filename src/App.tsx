@@ -4,6 +4,7 @@ import { AddItemForm } from './components/AddItemForm';
 import { ItemList } from './components/ItemList';
 import { ShareButton } from './components/ShareButton';
 import { ListChips } from './components/ListChips';
+import { useScrollProgress } from './hooks/useScrollProgress';
 
 const App: React.FC = () => {
   const { 
@@ -16,10 +17,13 @@ const App: React.FC = () => {
     removeItem, 
     clearDone,
     setActiveList,
-    createList
+    createList,
+    renameList,
+    deleteList
   } = useShoppingList();
   
   const [isInputFocused, setIsInputFocused] = useState(false);
+  const { isScrolled } = useScrollProgress();
 
   if (isLoading) {
     return <div className="loading">Загрузка...</div>;
@@ -31,16 +35,14 @@ const App: React.FC = () => {
 
   return (
     <div className={`app-container ${isInputFocused ? 'input-focused' : ''}`}>
-      <header className="app-header">
-        <h1>{list.title}</h1>
-        <span className="item-count">{list.items.length}</span>
-      </header>
-      
       <ListChips
         lists={allLists}
         activeListId={activeListId}
         onSelect={setActiveList}
         onCreate={createList}
+        onRename={renameList}
+        onDelete={deleteList}
+        isScrolled={isScrolled}
       />
       
       <main className="app-main">

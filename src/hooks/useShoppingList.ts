@@ -109,7 +109,32 @@ export const useShoppingList = () => {
     logEvent('list_created');
   }, []);
 
-  return { 
+    const renameList = useCallback(async (id: string, newTitle: string) => {
+    await localStorageRepository.renameList(id, newTitle);
+    const store = await localStorageRepository.getAllLists();
+    setAllLists(store.lists);
+    
+    if (id === activeListId) {
+      const updatedList = store.lists.find(l => l.id === id);
+      if (updatedList) setList(updatedList);
+    }
+    triggerHaptic('light');
+  }, [activeListId]);
+
+  const deleteList = useCallback(async (id: string) => {
+    await localStorageRepository.deleteList(id);
+    const store = await localStorageRepository.getAllLists();
+    setAllLists(store.lists);
+    
+    const newList = store.lists.find(l => l.id === store.activeListId);
+    if (newList) {
+      setList(newList);
+      setActiveListId(store.activeListId);
+    }
+    triggerHaptic('medium');
+  }, []);
+
+    return { 
     list, 
     allLists, 
     activeListId,
@@ -119,6 +144,8 @@ export const useShoppingList = () => {
     removeItem, 
     clearDone,
     setActiveList,
-    createList
+    createList,
+    renameList,
+    deleteList
   };
 };
