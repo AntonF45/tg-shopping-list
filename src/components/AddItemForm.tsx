@@ -54,8 +54,6 @@ export const AddItemForm: React.FC<Props> = ({ onAdd }) => {
         </button>
       </div>
       
-      <div className="qty-label">Количество</div>
-      
       <div className="qty-counter">
         <button 
           type="button" 
@@ -70,7 +68,7 @@ export const AddItemForm: React.FC<Props> = ({ onAdd }) => {
           type="text"
           inputMode="numeric"
           pattern="[0-9]*"
-          placeholder="Кол-во"
+          placeholder="0"
           value={qty}
           onChange={handleQtyChange}
           className="input-counter"
