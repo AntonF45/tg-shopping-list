@@ -17,17 +17,12 @@ export const ShareButton: React.FC<Props> = ({ items, onClearDone, isHidden }) =
 
   return (
     <div className={`floating-actions ${isHidden ? 'floating-actions--hidden' : ''}`}>
-      <button 
-        className="btn-share-island" 
-        onClick={() => shareList(items)}
-      >
-        <span className="btn-icon"></span>
+      <button className="btn-share-island" onClick={() => shareList(items)} type="button">
         <span>Отправить в чат</span>
       </button>
-      
+
       {hasDoneItems && (
-        <button className="btn-clear-island" onClick={onClearDone}>
-          <span className="btn-icon">🗑</span>
+        <button className="btn-clear-island" onClick={onClearDone} type="button">
           <span>Очистить</span>
         </button>
       )}

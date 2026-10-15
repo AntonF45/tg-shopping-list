@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { ShoppingList } from '../types/shopping';
 import { triggerHaptic } from '../lib/telegram';
 import { useLongPress } from '../hooks/useLongPress';
@@ -13,48 +13,70 @@ interface Props {
   isScrolled: boolean;
 }
 
-export const ListChips: React.FC<Props> = ({ 
-  lists, 
-  activeListId, 
-  onSelect, 
+interface MenuState {
+  listId: string;
+  anchorX: number;
+  top: number;
+}
+
+export const ListChips: React.FC<Props> = ({
+  lists,
+  activeListId,
+  onSelect,
   onCreate,
   onRename,
   onDelete,
-  isScrolled 
+  isScrolled,
 }) => {
   const [isCreating, setIsCreating] = useState(false);
   const [newTitle, setNewTitle] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState('');
-  
-  // Состояние для меню (позиция + id списка)
-  const [menuPosition, setMenuPosition] = useState<{ left: number; top: number } | null>(null);
-  const [menuListId, setMenuListId] = useState<string | null>(null);
+  const [menu, setMenu] = useState<MenuState | null>(null);
+  const [menuBox, setMenuBox] = useState<{ left: number; arrowLeft: number } | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  // Закрытие меню при клике вне
+  const closeMenu = () => {
+    setMenu(null);
+    setMenuBox(null);
+  };
+
+  // Закрытие по клику вне, по скроллу чипсов и по ресайзу
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent | TouchEvent) => {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+    if (!menu) return;
+
+    const onOutside = (e: MouseEvent | TouchEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
         closeMenu();
       }
     };
+    const onScroll = () => closeMenu();
 
-    if (menuListId) {
-      document.addEventListener('mousedown', handleClickOutside);
-      document.addEventListener('touchstart', handleClickOutside);
-    }
+    document.addEventListener('mousedown', onOutside);
+    document.addEventListener('touchstart', onOutside);
+    window.addEventListener('resize', onScroll);
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-      document.removeEventListener('touchstart', handleClickOutside);
+      document.removeEventListener('mousedown', onOutside);
+      document.removeEventListener('touchstart', onOutside);
+      window.removeEventListener('resize', onScroll);
     };
-  }, [menuListId]);
+  }, [menu]);
 
-  const closeMenu = () => {
-    setMenuPosition(null);
-    setMenuListId(null);
-  };
+  // Clamp меню по краям экрана ПОСЛЕ рендера (измеряем реальную ширину)
+  useLayoutEffect(() => {
+    if (!menu || !menuRef.current) return;
+
+    const rect = menuRef.current.getBoundingClientRect();
+    const margin = 12;
+    const half = rect.width / 2;
+    const vw = window.innerWidth;
+
+    const clampedLeft = Math.min(Math.max(menu.anchorX, half + margin), vw - half - margin);
+    const arrowLeft = half + (menu.anchorX - clampedLeft);
+
+    setMenuBox({ left: clampedLeft, arrowLeft });
+  }, [menu]);
 
   const handleCreate = () => {
     if (!newTitle.trim()) {
@@ -81,7 +103,7 @@ export const ListChips: React.FC<Props> = ({
   const handleDelete = (id: string, title: string) => {
     closeMenu();
     const tg = window.Telegram?.WebApp;
-    
+
     if (tg?.showConfirm) {
       tg.showConfirm(`Удалить список "${title}"?`, (confirmed: boolean) => {
         if (confirmed) {
@@ -89,11 +111,9 @@ export const ListChips: React.FC<Props> = ({
           onDelete(id);
         }
       });
-    } else {
-      if (window.confirm(`Удалить список "${title}"?`)) {
-        triggerHaptic('heavy');
-        onDelete(id);
-      }
+    } else if (window.confirm(`Удалить список "${title}"?`)) {
+      triggerHaptic('heavy');
+      onDelete(id);
     }
   };
 
@@ -113,155 +133,147 @@ export const ListChips: React.FC<Props> = ({
     }
   };
 
+  const openMenu = (listId: string, anchor: DOMRect) => {
+    setMenu({
+      listId,
+      anchorX: anchor.left + anchor.width / 2,
+      top: anchor.bottom + 8,
+    });
+    setMenuBox(null);
+    triggerHaptic('medium');
+  };
+
   const activeList = lists.find(l => l.id === activeListId);
 
   return (
     <div className={`list-chips-wrapper ${isScrolled ? 'scrolled' : ''}`}>
-      <div className="list-chips-container">
-        <div className="list-chips-scroll">
-          {lists.map(list => (
-            <div key={list.id} className="chip-wrapper">
-              {editingId === list.id ? (
-                <input
-                  type="text"
-                  className="chip-input"
-                  value={editTitle}
-                  onChange={e => setEditTitle(e.target.value)}
-                  onBlur={() => handleRename(list.id)}
-                  onKeyDown={e => handleKeyDown(e, 'rename', list.id)}
-                  autoFocus
-                />
-              ) : (
-                <ChipWithMenu
-                  list={list}
-                  isActive={list.id === activeListId}
-                  isMenuOpen={menuListId === list.id}
-                  onSelect={() => onSelect(list.id)}
-                  onLongPress={(button) => {
-                    const rect = button.getBoundingClientRect();
-                    setMenuPosition({
-                      left: rect.left + rect.width / 2,
-                      top: rect.top - 8,
-                    });
-                    setMenuListId(list.id);
-                    triggerHaptic('medium');
-                  }}
-                  onEdit={() => {
-                    closeMenu();
-                    setEditingId(list.id);
-                    setEditTitle(list.title);
-                    triggerHaptic('light');
-                  }}
-                  onDelete={() => handleDelete(list.id, list.title)}
-                />
-              )}
-            </div>
-          ))}
-          
-          {isCreating ? (
-            <input
-              type="text"
-              className="chip-input"
-              placeholder="Название"
-              value={newTitle}
-              onChange={e => setNewTitle(e.target.value)}
-              onBlur={handleCreate}
-              onKeyDown={e => handleKeyDown(e, 'create')}
-              autoFocus
-            />
-          ) : (
-            <button
-              className="list-chip list-chip-add"
-              onClick={() => {
-                setIsCreating(true);
-                triggerHaptic('light');
-              }}
-              type="button"
-              aria-label="Добавить список"
-            >
-              +
-            </button>
-          )}
-        </div>
+      {/* Ряд чипсов: сворачивается при скролле */}
+      <div className={`chips-row ${isScrolled ? 'chips-row--collapsed' : ''}`}>
+        {lists.map(list => (
+          <div key={list.id} className="chip-wrapper">
+            {editingId === list.id ? (
+              <input
+                type="text"
+                className="chip-input"
+                value={editTitle}
+                onChange={e => setEditTitle(e.target.value)}
+                onBlur={() => handleRename(list.id)}
+                onKeyDown={e => handleKeyDown(e, 'rename', list.id)}
+                autoFocus
+              />
+            ) : (
+              <ChipButton
+                list={list}
+                isActive={list.id === activeListId}
+                onSelect={() => onSelect(list.id)}
+                onLongPress={openMenu}
+              />
+            )}
+          </div>
+        ))}
+
+        {isCreating ? (
+          <input
+            type="text"
+            className="chip-input"
+            placeholder="Название"
+            value={newTitle}
+            onChange={e => setNewTitle(e.target.value)}
+            onBlur={handleCreate}
+            onKeyDown={e => handleKeyDown(e, 'create')}
+            autoFocus
+          />
+        ) : (
+          <button
+            className="list-chip list-chip-add"
+            onClick={() => {
+              setIsCreating(true);
+              triggerHaptic('light');
+            }}
+            type="button"
+            aria-label="Добавить список"
+          >
+            +
+          </button>
+        )}
       </div>
 
-      {/* Меню поверх всего */}
-      {menuPosition && menuListId && (
+      {/* Заголовок при скролле: внутри sticky-обёртки, без position: fixed */}
+      {activeList && (
+        <div className={`scrolled-header ${isScrolled ? 'scrolled-header--visible' : ''}`}>
+          <span className="scrolled-title">{activeList.title}</span>
+          <span className="scrolled-count">{activeList.items.length}</span>
+        </div>
+      )}
+
+      {/* Меню чипса: fixed + clamp по краям экрана */}
+      {menu && (
         <div
           className="chip-menu-overlay"
           style={{
-            left: menuPosition.left,
-            top: menuPosition.top,
+            left: menuBox ? menuBox.left : menu.anchorX,
+            top: menu.top,
+            visibility: menuBox ? 'visible' : 'hidden',
           }}
         >
-          <div className="chip-menu" ref={menuRef}>
+          <div
+            className="chip-menu"
+            ref={menuRef}
+            style={{ '--arrow-left': `${menuBox?.arrowLeft ?? 50}px` } as React.CSSProperties}
+          >
             <button
               className="chip-menu-item"
-              onClick={() => {
-                const list = lists.find(l => l.id === menuListId);
-                if (list) {
-                  setEditingId(list.id);
-                  setEditTitle(list.title);
-                }
-                closeMenu();
-                triggerHaptic('light');
-              }}
               type="button"
+              aria-label="Редактировать список"
+              onClick={() => {
+                const target = lists.find(l => l.id === menu.listId);
+                closeMenu();
+                if (target) {
+                  setEditingId(target.id);
+                  setEditTitle(target.title);
+                  triggerHaptic('light');
+                }
+              }}
             >
-              <span className="menu-icon">✏️</span>
+              ✏️
             </button>
             {lists.length > 1 && (
               <button
-                className="chip-menu-item chip-menu-delete"
-                onClick={() => {
-                  const list = lists.find(l => l.id === menuListId);
-                  if (list) handleDelete(list.id, list.title);
-                }}
+                className="chip-menu-item chip-menu-item--delete"
                 type="button"
+                aria-label="Удалить список"
+                onClick={() => {
+                  const target = lists.find(l => l.id === menu.listId);
+                  if (target) handleDelete(target.id, target.title);
+                }}
               >
-                <span className="menu-icon">🗑</span>
+                🗑
               </button>
             )}
           </div>
-        </div>
-      )}
-      
-      {/* Анимированный заголовок при скролле */}
-      {isScrolled && activeList && (
-        <div className="scrolled-header">
-          <span className="scrolled-title">{activeList.title}</span>
-          <span className="scrolled-count">{activeList.items.length}</span>
         </div>
       )}
     </div>
   );
 };
 
-interface ChipWithMenuProps {
+interface ChipButtonProps {
   list: ShoppingList;
   isActive: boolean;
-  isMenuOpen: boolean;
   onSelect: () => void;
-  onLongPress: (button: HTMLButtonElement) => void;
-  onEdit: () => void;
-  onDelete: () => void;
+  onLongPress: (listId: string, anchor: DOMRect) => void;
 }
 
-const ChipWithMenu: React.FC<ChipWithMenuProps> = ({
-  list,
-  isActive,
-  onSelect,
-  onLongPress,
-}) => {
+const ChipButton: React.FC<ChipButtonProps> = ({ list, isActive, onSelect, onLongPress }) => {
   const buttonRef = useRef<HTMLButtonElement>(null);
 
   const longPressHandlers = useLongPress({
     onLongPress: () => {
       if (buttonRef.current) {
-        onLongPress(buttonRef.current);
+        onLongPress(list.id, buttonRef.current.getBoundingClientRect());
       }
     },
-    onClick: onSelect, // Без вибрации — только визуальная обратная связь
+    onClick: onSelect,
     threshold: 500,
   });
 
@@ -269,13 +281,11 @@ const ChipWithMenu: React.FC<ChipWithMenuProps> = ({
     <button
       ref={buttonRef}
       className={`list-chip ${isActive ? 'active' : ''}`}
-      {...longPressHandlers}
       type="button"
+      {...longPressHandlers}
     >
       {list.title}
-      {list.items.length > 0 && (
-        <span className="chip-count">{list.items.length}</span>
-      )}
+      {list.items.length > 0 && <span className="chip-count">{list.items.length}</span>}
     </button>
   );
 };
