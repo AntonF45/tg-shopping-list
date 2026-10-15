@@ -452,30 +452,28 @@ body {
 .app-container {
   display: flex;
   flex-direction: column;
-  min-height: 100dvh; /* Используем dvh для лучшей поддержки мобильных */
+  min-height: 100vh;
   max-width: 600px;
   margin: 0 auto;
   padding: var(--spacing);
-  padding-bottom: 120px; /* Место для кнопок внизу */
+  padding-bottom: 140px; /* Место для плавающих кнопок */
   background: var(--moss-cream);
   transition: background-color 0.3s ease;
-  position: relative; /* Важно для absolute позиционирования кнопок */
+  position: relative;
 }
 
-/* ... (остальные стили формы и чек-листа остаются без изменений) ... */
-
-/* === Кнопки-острова внизу (НЕ поднимаются с клавиатурой) === */
+/* === Плавающие кнопки-острова (стабильные при клавиатуре) === */
 .floating-actions {
-  position: absolute; /* Было: fixed */
-  bottom: 24px;
+  position: fixed;
+  bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
   gap: 12px;
   width: calc(100% - 32px);
   max-width: 568px;
-  z-index: 10;
-  transition: opacity 0.3s ease, transform 0.3s ease;
+  z-index: 100;
+  pointer-events: none; /* Пропускаем клики сквозь контейнер */
 }
 
 .btn-share-island,
@@ -484,51 +482,97 @@ body {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 14px 24px;
+  padding: 16px 28px;
   border: none;
-  border-radius: var(--border-radius-pill);
+  border-radius: 50px;
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
-  box-shadow: var(--moss-shadow-hover);
-  transition: all 0.3s ease;
-  flex: 1; /* Кнопки делят пространство поровну */
+  box-shadow: 0 8px 24px rgba(26, 47, 35, 0.15);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: auto; /* Возвращаем клики для кнопок */
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 .btn-share-island {
-  background: var(--moss-lime);
+  background: rgba(168, 224, 99, 0.95);
   color: var(--moss-evergreen);
+  flex: 1;
 }
 
 .btn-share-island:hover {
   transform: translateY(-2px);
-  box-shadow: var(--moss-shadow-hover);
+  box-shadow: 0 12px 32px rgba(26, 47, 35, 0.2);
+  background: rgba(168, 224, 99, 1);
 }
 
 .btn-share-island:active {
   transform: translateY(0) scale(0.98);
+  box-shadow: 0 4px 16px rgba(26, 47, 35, 0.15);
 }
 
 .btn-clear-island {
-  background: var(--moss-cream-dark);
+  background: rgba(232, 228, 220, 0.95);
   color: var(--moss-sage);
-  border: 2px solid var(--moss-cream-dark);
-  flex: 0 0 auto; /* Кнопка очистки не растягивается, занимает место по контенту */
+  border: 2px solid rgba(232, 228, 220, 0.8);
+  flex: 0 0 auto;
+  padding: 16px 20px;
 }
 
 .btn-clear-island:hover {
   border-color: #e74c3c;
   color: #e74c3c;
-  background: rgba(231, 76, 60, 0.05);
+  background: rgba(231, 76, 60, 0.08);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(231, 76, 60, 0.15);
 }
 
 .btn-clear-island:active {
-  transform: scale(0.98);
+  transform: translateY(0) scale(0.98);
 }
 
 .btn-icon {
   font-size: 18px;
   line-height: 1;
+}
+
+/* Адаптация для тёмной темы */
+[data-theme="dark"] .btn-share-island {
+  background: rgba(168, 224, 99, 0.9);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .btn-share-island:hover {
+  background: rgba(168, 224, 99, 1);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] .btn-clear-island {
+  background: rgba(37, 64, 53, 0.9);
+  border-color: rgba(37, 64, 53, 0.8);
+  color: var(--moss-sage);
+}
+
+[data-theme="dark"] .btn-clear-island:hover {
+  background: rgba(231, 76, 60, 0.1);
+  box-shadow: 0 12px 32px rgba(231, 76, 60, 0.2);
+}
+
+/* Анимация появления кнопок */
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+.floating-actions {
+  animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* === Loading / Error === */
