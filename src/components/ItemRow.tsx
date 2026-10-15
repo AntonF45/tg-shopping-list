@@ -19,20 +19,21 @@ export const ItemRow: React.FC<Props> = ({ item, onToggle, onRemove }) => {
           onToggle(item.id);
         }}
         id={`item-${item.id}`}
+        className="checklist-checkbox"
       />
-      <label htmlFor={`item-${item.id}`} className="item-label">
+      <label htmlFor={`item-${item.id}`} className="checklist-label">
         <span className="item-name">{item.name}</span>
         {item.qty && <span className="item-qty">× {item.qty}</span>}
       </label>
       <button 
-        className="btn-remove-small" 
+        className="btn-remove-item" 
         onClick={() => {
           triggerHaptic('light');
           onRemove(item.id);
         }}
         aria-label="Удалить"
       >
-        ✕
+        
       </button>
     </div>
   );

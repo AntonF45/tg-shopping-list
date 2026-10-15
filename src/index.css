@@ -233,166 +233,137 @@ body {
 .item-list {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 0;
   margin-bottom: 20px;
+  background: var(--moss-cream);
+  border-radius: var(--border-radius);
+  padding: 20px;
+  box-shadow: var(--moss-shadow);
 }
 
 .checklist-item {
-  display: grid;
-  grid-template-columns: 30px auto 40px;
+  display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
-  background: var(--moss-cream);
-  border-radius: var(--border-radius-sm);
-  box-shadow: var(--moss-shadow);
-  transition: all 0.3s ease;
-}
-
-.checklist-item input[type="checkbox"] {
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--moss-cream-dark);
   position: relative;
-  height: 20px;
-  width: 20px;
-  outline: none;
-  border: 2px solid var(--moss-sage);
-  border-radius: 4px;
-  margin: 0;
+  gap: 12px;
+}
+
+.checklist-item:last-child {
+  border-bottom: none;
+}
+
+.checklist-checkbox {
+  margin-right: 12px;
   cursor: pointer;
-  background: var(--moss-cream);
-  transition: all 0.3s ease;
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  accent-color: var(--moss-lime);
+  transform: scale(1.1);
 }
 
-.checklist-item input[type="checkbox"]::before,
-.checklist-item input[type="checkbox"]::after {
-  content: "";
-  position: absolute;
-  height: 2px;
-  top: 50%;
-  background: var(--moss-lime);
-  border-radius: 2px;
-  transition: all 0.3s ease;
-}
-
-.checklist-item input[type="checkbox"]::before {
-  width: 0;
-  right: 50%;
-  transform-origin: right bottom;
-  transform: translateY(-50%) rotate(0);
-}
-
-.checklist-item input[type="checkbox"]::after {
-  width: 0;
-  left: 50%;
-  transform-origin: left bottom;
-  transform: translateY(-50%) rotate(0);
-}
-
-.checklist-item input[type="checkbox"]:checked {
-  border-color: var(--moss-lime);
-  background: var(--moss-lime);
-}
-
-.checklist-item input[type="checkbox"]:checked::before {
-  animation: check-01 0.4s ease forwards;
-}
-
-.checklist-item input[type="checkbox"]:checked::after {
-  animation: check-02 0.4s ease forwards;
-}
-
-@keyframes check-01 {
-  0% {
-    width: 4px;
-    transform: translateY(-50%) rotate(0);
-  }
-  50% {
-    width: 0;
-    transform: translateY(-50%) rotate(0);
-  }
-  51% {
-    width: 0;
-    transform: translateY(-50%) rotate(45deg);
-  }
-  100% {
-    width: 6px;
-    transform: translateY(-50%) rotate(45deg);
-  }
-}
-
-@keyframes check-02 {
-  0% {
-    width: 4px;
-    transform: translateY(-50%) rotate(0);
-  }
-  50% {
-    width: 0;
-    transform: translateY(-50%) rotate(0);
-  }
-  51% {
-    width: 0;
-    transform: translateY(-50%) rotate(-45deg);
-  }
-  100% {
-    width: 12px;
-    transform: translateY(-50%) rotate(-45deg);
-  }
-}
-
-.item-label {
+.checklist-label {
+  color: var(--moss-evergreen);
+  cursor: pointer;
+  position: relative;
+  transition: color 0.4s ease-in-out;
   display: flex;
   align-items: center;
   gap: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease;
+  flex: 1;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.checklist-label::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: #e74c3c;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.4s ease-out;
+  pointer-events: none;
 }
 
 .item-name {
-  font-size: 16px;
-  font-weight: 500;
-  color: var(--moss-evergreen);
-  transition: all 0.3s ease;
+  transition: color 0.4s ease-in-out;
 }
 
 .item-qty {
   font-size: 14px;
   color: var(--moss-sage);
   font-family: 'SF Mono', 'Monaco', monospace;
-  transition: color 0.3s ease;
+  transition: color 0.4s ease-in-out;
 }
 
-.checklist-item input[type="checkbox"]:checked + .item-label .item-name {
-  text-decoration: line-through;
-  color: var(--moss-sage);
+.checklist-checkbox:checked + .checklist-label {
+  color: #aaa;
 }
 
-.checklist-item input[type="checkbox"]:checked + .item-label .item-qty {
-  color: var(--moss-sage);
-  opacity: 0.6;
+.checklist-checkbox:checked + .checklist-label .item-name {
+  color: #aaa;
 }
 
-.btn-remove-small {
+.checklist-checkbox:checked + .checklist-label .item-qty {
+  color: #999;
+}
+
+.checklist-checkbox:checked + .checklist-label::after {
+  transform: scaleX(1);
+}
+
+.btn-remove-item {
   width: 32px;
   height: 32px;
   border: none;
   background: transparent;
   color: var(--moss-sage);
-  font-size: 16px;
+  font-size: 18px;
   cursor: pointer;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.3s ease;
-  opacity: 0.5;
+  opacity: 0;
+  flex-shrink: 0;
 }
 
-.btn-remove-small:hover {
+.checklist-item:hover .btn-remove-item {
   opacity: 1;
-  color: #FF6B6B;
-  background: rgba(255, 107, 107, 0.1);
+}
+
+.btn-remove-item:hover {
+  background: rgba(231, 76, 60, 0.1);
+  color: #e74c3c;
+  transform: scale(1.1);
+}
+
+.btn-remove-item:active {
+  transform: scale(0.95);
+}
+
+/* Адаптация для тёмной темы */
+[data-theme="dark"] .checklist-label {
+  color: var(--moss-evergreen);
+}
+
+[data-theme="dark"] .checklist-checkbox:checked + .checklist-label {
+  color: #888;
+}
+
+[data-theme="dark"] .checklist-checkbox:checked + .checklist-label .item-name {
+  color: #888;
+}
+
+[data-theme="dark"] .checklist-item {
+  border-bottom-color: var(--moss-evergreen-light);
 }
 
 /* === Пустое состояние === */
