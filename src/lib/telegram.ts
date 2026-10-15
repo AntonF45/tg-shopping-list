@@ -13,18 +13,20 @@ export const applyTheme = () => {
 
   const isDark = tg.colorScheme === 'dark';
 
+  // Переключаем CSS переменные через атрибут
   document.documentElement.setAttribute(
     'data-theme',
     isDark ? 'dark' : 'light'
   );
 
+  // Красим шапку Telegram
   const headerColor = isDark ? MOSS_DARK : MOSS_LIGHT;
 
   try {
     tg.setHeaderColor(headerColor);
     tg.setBackgroundColor(headerColor);
   } catch {
-    // Старые версии Telegram Mini Apps могут не поддерживать HEX
+    // Фоллбэк для старых версий
     tg.setHeaderColor?.('bg_color');
     tg.setBackgroundColor?.('bg_color');
   }
@@ -43,8 +45,8 @@ export const initTelegram = () => {
 
   applyTheme();
 
+  // Слушаем смену темы внутри Telegram
   tg.onEvent('themeChanged', () => {
-    // Важно: читаем colorScheme заново внутри события
     applyTheme();
   });
 };
