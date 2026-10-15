@@ -1,17 +1,51 @@
 :root {
-  /* Telegram Theme Variables Fallbacks */
-  --tg-bg-color: var(--tg-theme-bg-color, #ffffff);
-  --tg-text-color: var(--tg-theme-text-color, #000000);
-  --tg-hint-color: var(--tg-theme-hint-color, #999999);
-  --tg-link-color: var(--tg-theme-link-color, #2481cc);
-  --tg-button-color: var(--tg-theme-button-color, #2481cc);
-  --tg-button-text-color: var(--tg-theme-button-text-color, #ffffff);
-  --tg-secondary-bg-color: var(--tg-theme-secondary-bg-color, #f0f0f0);
+  /* Mossforge Color System - Адаптировано под Telegram */
   
-  --danger-color: #ff3b30;
-  --success-color: #34c759;
-  --border-radius: 12px;
+  /* Светлая тема (по умолчанию) */
+  --tg-bg-color: var(--tg-theme-bg-color, #F5F3EC);
+  --tg-text-color: var(--tg-theme-text-color, #1A2F23);
+  --tg-hint-color: var(--tg-theme-hint-color, #6B7F73);
+  --tg-link-color: var(--tg-theme-link-color, #8FD14F);
+  --tg-button-color: var(--tg-theme-button-color, #A8E063);
+  --tg-button-text-color: var(--tg-theme-button-text-color, #1A2F23);
+  --tg-secondary-bg-color: var(--tg-theme-secondary-bg-color, #E8E4DC);
+  
+  /* Mossforge акценты */
+  --moss-cream: #F5F3EC;
+  --moss-cream-dark: #E8E4DC;
+  --moss-lime: #A8E063;
+  --moss-lime-dark: #8FD14F;
+  --moss-evergreen: #1A2F23;
+  --moss-evergreen-light: #2D4A3E;
+  --moss-sage: #6B7F73;
+  
+  /* Тени и эффекты */
+  --moss-shadow: 0 4px 20px rgba(26, 47, 35, 0.08);
+  --moss-shadow-hover: 0 8px 30px rgba(26, 47, 35, 0.12);
+  --border-radius: 16px;
+  --border-radius-sm: 8px;
+  --border-radius-pill: 50px;
   --spacing: 16px;
+}
+
+/* Тёмная тема Telegram */
+[data-theme="dark"] {
+  --tg-bg-color: var(--tg-theme-bg-color, #1A2F23);
+  --tg-text-color: var(--tg-theme-text-color, #F5F3EC);
+  --tg-hint-color: var(--tg-theme-hint-color, #8FA396);
+  --tg-link-color: var(--tg-theme-link-color, #A8E063);
+  --tg-button-color: var(--tg-theme-button-color, #2D4A3E);
+  --tg-button-text-color: var(--tg-theme-button-text-color, #F5F3EC);
+  --tg-secondary-bg-color: var(--tg-theme-secondary-bg-color, #254035);
+  
+  --moss-cream: #1A2F23;
+  --moss-cream-dark: #254035;
+  --moss-evergreen: #F5F3EC;
+  --moss-evergreen-light: #E8E4DC;
+  --moss-sage: #8FA396;
+  
+  --moss-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  --moss-shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.4);
 }
 
 * {
@@ -27,6 +61,7 @@ body {
   color: var(--tg-text-color);
   line-height: 1.5;
   overflow-x: hidden;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .app-container {
@@ -36,32 +71,43 @@ body {
   max-width: 600px;
   margin: 0 auto;
   padding: var(--spacing);
+  background: var(--moss-cream);
 }
 
+/* Header в стиле Mossforge */
 .app-header {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: var(--spacing);
-  padding-bottom: 12px;
-  border-bottom: 1px solid var(--tg-secondary-bg-color);
+  margin-bottom: 24px;
+  padding: 20px;
+  background: var(--moss-cream-dark);
+  border-radius: var(--border-radius);
+  box-shadow: var(--moss-shadow);
 }
 
 .app-header h1 {
   font-size: 28px;
   font-weight: 700;
+  color: var(--moss-evergreen);
+  letter-spacing: -0.5px;
+}
+
+[data-theme="dark"] .app-header h1 {
+  color: var(--moss-evergreen);
 }
 
 .item-count {
-  background: var(--tg-secondary-bg-color);
-  color: var(--tg-hint-color);
-  padding: 4px 10px;
-  border-radius: 20px;
+  background: var(--moss-lime);
+  color: var(--moss-evergreen);
+  padding: 6px 14px;
+  border-radius: var(--border-radius-pill);
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', monospace;
 }
 
-/* Form */
+/* Форма добавления - Mossforge style */
 .add-form {
   display: flex;
   flex-direction: column;
@@ -71,18 +117,27 @@ body {
 
 .input-name, .input-qty, .input-category {
   width: 100%;
-  padding: 14px;
-  border: 1px solid var(--tg-secondary-bg-color);
+  padding: 16px 20px;
+  border: 2px solid var(--moss-cream-dark);
   border-radius: var(--border-radius);
-  background: var(--tg-bg-color);
-  color: var(--tg-text-color);
+  background: var(--moss-cream);
+  color: var(--moss-evergreen);
   font-size: 16px;
   outline: none;
-  transition: border-color 0.2s;
+  transition: all 0.3s ease;
+  box-shadow: var(--moss-shadow);
+}
+
+[data-theme="dark"] .input-name,
+[data-theme="dark"] .input-qty,
+[data-theme="dark"] .input-category {
+  color: var(--moss-evergreen);
+  border-color: var(--moss-evergreen-light);
 }
 
 .input-name:focus, .input-qty:focus, .input-category:focus {
-  border-color: var(--tg-button-color);
+  border-color: var(--moss-lime);
+  box-shadow: 0 0 0 4px rgba(168, 224, 99, 0.15);
 }
 
 .form-row {
@@ -97,59 +152,80 @@ body {
 .input-category {
   flex: 1;
   appearance: none;
-  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23999999%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%231A2F23%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
   background-repeat: no-repeat;
-  background-position: right 12px top 50%;
-  background-size: 10px auto;
+  background-position: right 16px top 50%;
+  background-size: 12px auto;
 }
 
 .btn-add {
-  width: 52px;
-  height: 52px;
+  width: 56px;
+  height: 56px;
   border: none;
-  border-radius: var(--border-radius);
-  background: var(--tg-button-color);
-  color: var(--tg-button-text-color);
-  font-size: 24px;
-  font-weight: bold;
+  border-radius: var(--border-radius-pill);
+  background: linear-gradient(135deg, var(--moss-lime) 0%, var(--moss-lime-dark) 100%);
+  color: var(--moss-evergreen);
+  font-size: 28px;
+  font-weight: 700;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  box-shadow: var(--moss-shadow);
+  transition: all 0.3s ease;
+}
+
+.btn-add:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--moss-shadow-hover);
+}
+
+.btn-add:active {
+  transform: translateY(0);
 }
 
 .btn-add:disabled {
-  opacity: 0.5;
+  opacity: 0.4;
   cursor: not-allowed;
+  transform: none;
 }
 
-/* List */
+/* Список товаров - Mossforge cards */
 .item-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-bottom: 80px; /* Space for footer */
+  gap: 12px;
+  margin-bottom: 100px;
 }
 
 .item-row {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px;
-  background: var(--tg-secondary-bg-color);
+  padding: 16px 20px;
+  background: var(--moss-cream);
   border-radius: var(--border-radius);
-  transition: opacity 0.2s;
+  box-shadow: var(--moss-shadow);
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.item-row:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--moss-shadow-hover);
+  border-color: var(--moss-lime);
 }
 
 .item-row.done {
   opacity: 0.6;
+  background: var(--moss-cream-dark);
 }
 
 .checkbox-container {
   position: relative;
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
   cursor: pointer;
   flex-shrink: 0;
 }
@@ -164,28 +240,29 @@ body {
   position: absolute;
   top: 0;
   left: 0;
-  width: 24px;
-  height: 24px;
-  background-color: transparent;
-  border: 2px solid var(--tg-hint-color);
-  border-radius: 6px;
+  width: 28px;
+  height: 28px;
+  background-color: var(--moss-cream-dark);
+  border: 2px solid var(--moss-sage);
+  border-radius: var(--border-radius-sm);
+  transition: all 0.3s ease;
 }
 
 .checkbox-container input:checked ~ .checkmark {
-  background-color: var(--success-color);
-  border-color: var(--success-color);
+  background-color: var(--moss-lime);
+  border-color: var(--moss-lime);
 }
 
 .checkmark:after {
   content: "";
   position: absolute;
   display: none;
-  left: 7px;
-  top: 3px;
-  width: 6px;
-  height: 12px;
-  border: solid white;
-  border-width: 0 2px 2px 0;
+  left: 9px;
+  top: 5px;
+  width: 7px;
+  height: 14px;
+  border: solid var(--moss-evergreen);
+  border-width: 0 3px 3px 0;
   transform: rotate(45deg);
 }
 
@@ -202,65 +279,79 @@ body {
 
 .item-name {
   font-size: 16px;
-  font-weight: 500;
+  font-weight: 600;
+  color: var(--moss-evergreen);
+}
+
+[data-theme="dark"] .item-name {
+  color: var(--moss-evergreen);
 }
 
 .item-row.done .item-name {
   text-decoration: line-through;
-  color: var(--tg-hint-color);
+  color: var(--moss-sage);
 }
 
 .item-qty {
   font-size: 14px;
-  color: var(--tg-hint-color);
+  color: var(--moss-sage);
   margin-top: 2px;
+  font-family: 'SF Mono', 'Monaco', monospace;
 }
 
 .btn-remove {
-  width: 36px;
-  height: 36px;
-  border: none;
+  width: 40px;
+  height: 40px;
+  border: 2px solid var(--moss-cream-dark);
   background: transparent;
-  color: var(--danger-color);
+  color: var(--moss-sage);
   font-size: 18px;
   cursor: pointer;
-  border-radius: 50%;
+  border-radius: var(--border-radius-sm);
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: all 0.3s ease;
 }
 
-.btn-remove:active {
-  background: rgba(255, 59, 48, 0.1);
+.btn-remove:hover {
+  border-color: #FF6B6B;
+  color: #FF6B6B;
+  background: rgba(255, 107, 107, 0.1);
 }
 
 .section-divider {
   font-size: 13px;
   text-transform: uppercase;
-  color: var(--tg-hint-color);
-  margin: 16px 0 8px 4px;
-  font-weight: 600;
-  letter-spacing: 0.5px;
+  color: var(--moss-sage);
+  margin: 20px 0 8px 4px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  font-family: 'SF Mono', 'Monaco', monospace;
 }
 
 .empty-state {
   text-align: center;
-  color: var(--tg-hint-color);
-  padding: 40px 20px;
+  color: var(--moss-sage);
+  padding: 60px 20px;
   font-size: 16px;
+  background: var(--moss-cream-dark);
+  border-radius: var(--border-radius);
+  border: 2px dashed var(--moss-cream-dark);
 }
 
-/* Footer */
+/* Footer и кнопки - Mossforge style */
 .app-footer {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  background: var(--tg-bg-color);
-  padding: 16px;
-  border-top: 1px solid var(--tg-secondary-bg-color);
+  background: var(--moss-cream);
+  padding: 20px;
+  border-top: 2px solid var(--moss-cream-dark);
   max-width: 600px;
   margin: 0 auto;
+  box-shadow: 0 -4px 20px rgba(26, 47, 35, 0.08);
 }
 
 .actions-bar {
@@ -271,38 +362,89 @@ body {
 
 .btn-share {
   width: 100%;
-  padding: 16px;
+  padding: 18px 24px;
   border: none;
-  border-radius: var(--border-radius);
-  background: var(--tg-button-color);
-  color: var(--tg-button-text-color);
+  border-radius: var(--border-radius-pill);
+  background: linear-gradient(135deg, var(--moss-lime) 0%, var(--moss-lime-dark) 100%);
+  color: var(--moss-evergreen);
   font-size: 17px;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
+  box-shadow: var(--moss-shadow);
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-share::after {
+  content: "→";
+  font-size: 20px;
+  transition: transform 0.3s ease;
+}
+
+.btn-share:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--moss-shadow-hover);
+}
+
+.btn-share:hover::after {
+  transform: translateX(4px);
+}
+
+.btn-share:active {
+  transform: translateY(0);
 }
 
 .btn-share:disabled {
-  opacity: 0.5;
+  opacity: 0.4;
   cursor: not-allowed;
+  transform: none;
 }
 
 .btn-clear {
   width: 100%;
-  padding: 14px;
-  border: 1px solid var(--danger-color);
-  border-radius: var(--border-radius);
+  padding: 16px 24px;
+  border: 2px solid var(--moss-cream-dark);
+  border-radius: var(--border-radius-pill);
   background: transparent;
-  color: var(--danger-color);
+  color: var(--moss-sage);
   font-size: 15px;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
+  transition: all 0.3s ease;
 }
 
+.btn-clear:hover {
+  border-color: #FF6B6B;
+  color: #FF6B6B;
+  background: rgba(255, 107, 107, 0.05);
+}
+
+/* Loading и Error states */
 .loading, .error {
   display: flex;
   align-items: center;
   justify-content: center;
   height: 100vh;
   font-size: 18px;
-  color: var(--tg-hint-color);
+  color: var(--moss-sage);
+  background: var(--moss-cream);
+}
+
+/* Анимации */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.item-row {
+  animation: fadeIn 0.3s ease;
 }
