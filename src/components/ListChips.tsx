@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useLayoutEffect, useRef, useCallback } from 'react';
 import { ShoppingList } from '../types/shopping';
 import { triggerHaptic } from '../lib/telegram';
+import { useScrollProgress } from '../hooks/useScrollProgress';
 
 interface Props {
   lists: ShoppingList[];
@@ -9,7 +10,6 @@ interface Props {
   onCreate: (title: string) => void;
   onRename: (id: string, newTitle: string) => void;
   onDelete: (id: string) => void;
-  isScrolled: boolean;
 }
 
 interface MenuState {
@@ -25,7 +25,6 @@ export const ListChips: React.FC<Props> = ({
   onCreate,
   onRename,
   onDelete,
-  isScrolled,
 }) => {
   const [isCreating, setIsCreating] = useState(false);
   const [newTitle, setNewTitle] = useState('');
@@ -33,65 +32,50 @@ export const ListChips: React.FC<Props> = ({
   const [editTitle, setEditTitle] = useState('');
   const [menu, setMenu] = useState<MenuState | null>(null);
   const [menuBox, setMenuBox] = useState<{ left: number; arrowLeft: number } | null>(null);
+
   const menuRef = useRef<HTMLDivElement>(null);
   const chipsRowRef = useRef<HTMLDivElement>(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+
+  // Передаём ref на контейнер чипсов — хук будет слушать его скролл
+  const { isScrolled } = useScrollProgress({
+    threshold: 80,
+    containerRef: wrapperRef,
+  });
 
   const closeMenu = useCallback(() => {
     setMenu(null);
     setMenuBox(null);
   }, []);
 
-    // Закрытие меню по клику вне и по скроллу
   useEffect(() => {
     if (!menu) return;
 
     const onOutside = (e: PointerEvent) => {
       const target = e.target as Node;
-      
-      // Если клик по меню — не закрываем
-      if (menuRef.current?.contains(target)) {
-        return;
-      }
-      
-      // Если клик по чипсам — не закрываем (чипс сам решит)
-      if (chipsRowRef.current?.contains(target)) {
-        return;
-      }
-      
-      // Клик вне — закрываем
+      if (menuRef.current?.contains(target)) return;
+      if (chipsRowRef.current?.contains(target)) return;
       closeMenu();
     };
 
-    const onWindowScroll = () => closeMenu();
-
-    // Закрытие меню при горизонтальном скролле чипсов
-    const chipsRow = chipsRowRef.current;
-    const onChipsScroll = () => {
-      console.log('[UI] Меню закрыто: скролл чипсов');
-      closeMenu();
-    };
+    const onScroll = () => closeMenu();
 
     document.addEventListener('pointerdown', onOutside, { capture: true });
-    window.addEventListener('resize', onWindowScroll);
-    window.addEventListener('scroll', onWindowScroll, { passive: true });
-    
-    // Слушаем скролл контейнера чипсов
-    if (chipsRow) {
-      chipsRow.addEventListener('scroll', onChipsScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    window.addEventListener('scroll', onScroll, { passive: true });
+
+    if (chipsRowRef.current) {
+      chipsRowRef.current.addEventListener('scroll', onScroll, { passive: true });
     }
 
     return () => {
       document.removeEventListener('pointerdown', onOutside, { capture: true });
-      window.removeEventListener('resize', onWindowScroll);
-      window.removeEventListener('scroll', onWindowScroll);
-      
-      if (chipsRow) {
-        chipsRow.removeEventListener('scroll', onChipsScroll);
-      }
+      window.removeEventListener('resize', onScroll);
+      window.removeEventListener('scroll', onScroll);
+      chipsRowRef.current?.removeEventListener('scroll', onScroll);
     };
   }, [menu, closeMenu]);
 
-  // Clamp меню по краям экрана
   useLayoutEffect(() => {
     if (!menu || !menuRef.current) return;
 
@@ -100,7 +84,10 @@ export const ListChips: React.FC<Props> = ({
     const half = rect.width / 2;
     const vw = window.innerWidth;
 
-    const clampedCenter = Math.min(Math.max(menu.anchorX, half + margin), vw - half - margin);
+    const clampedCenter = Math.min(
+      Math.max(menu.anchorX, half + margin),
+      vw - half - margin
+    );
     const left = clampedCenter - half;
     const arrowLeft = half + (menu.anchorX - clampedCenter);
 
@@ -118,54 +105,66 @@ export const ListChips: React.FC<Props> = ({
     triggerHaptic('medium');
   }, [newTitle, onCreate]);
 
-  const handleRename = useCallback((id: string) => {
-    if (!editTitle.trim()) {
-      setEditingId(null);
-      return;
-    }
-    onRename(id, editTitle.trim());
-    setEditingId(null);
-    setEditTitle('');
-    triggerHaptic('medium');
-  }, [editTitle, onRename]);
-
-  const handleDelete = useCallback((id: string, title: string) => {
-    closeMenu();
-    const tg = window.Telegram?.WebApp;
-
-    if (tg?.showConfirm) {
-      tg.showConfirm(`Удалить список "${title}"?`, (confirmed: boolean) => {
-        if (confirmed) {
-          triggerHaptic('heavy');
-          onDelete(id);
-        }
-      });
-    } else if (window.confirm(`Удалить список "${title}"?`)) {
-      triggerHaptic('heavy');
-      onDelete(id);
-    }
-  }, [closeMenu, onDelete]);
-
-  const handleKeyDown = useCallback((e: React.KeyboardEvent, action: 'create' | 'rename', id?: string) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      if (action === 'create') handleCreate();
-      else if (id) handleRename(id);
-    } else if (e.key === 'Escape') {
-      if (action === 'create') {
-        setIsCreating(false);
-        setNewTitle('');
-      } else {
+  const handleRename = useCallback(
+    (id: string) => {
+      if (!editTitle.trim()) {
         setEditingId(null);
-        setEditTitle('');
+        return;
       }
-    }
-  }, [handleCreate, handleRename]);
+      onRename(id, editTitle.trim());
+      setEditingId(null);
+      setEditTitle('');
+      triggerHaptic('medium');
+    },
+    [editTitle, onRename]
+  );
 
-  const handleChipClick = useCallback((listId: string) => {
-    closeMenu();
-    onSelect(listId);
-  }, [closeMenu, onSelect]);
+  const handleDelete = useCallback(
+    (id: string, title: string) => {
+      closeMenu();
+      const tg = window.Telegram?.WebApp;
+
+      if (tg?.showConfirm) {
+        tg.showConfirm(`Удалить список "${title}"?`, (confirmed: boolean) => {
+          if (confirmed) {
+            triggerHaptic('heavy');
+            onDelete(id);
+          }
+        });
+      } else if (window.confirm(`Удалить список "${title}"?`)) {
+        triggerHaptic('heavy');
+        onDelete(id);
+      }
+    },
+    [closeMenu, onDelete]
+  );
+
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent, action: 'create' | 'rename', id?: string) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        if (action === 'create') handleCreate();
+        else if (id) handleRename(id);
+      } else if (e.key === 'Escape') {
+        if (action === 'create') {
+          setIsCreating(false);
+          setNewTitle('');
+        } else {
+          setEditingId(null);
+          setEditTitle('');
+        }
+      }
+    },
+    [handleCreate, handleRename]
+  );
+
+  const handleChipClick = useCallback(
+    (listId: string) => {
+      closeMenu();
+      onSelect(listId);
+    },
+    [closeMenu, onSelect]
+  );
 
   const openMenu = useCallback((listId: string, anchor: DOMRect) => {
     setMenu({
@@ -177,21 +176,28 @@ export const ListChips: React.FC<Props> = ({
     triggerHaptic('medium');
   }, []);
 
-  const activeList = lists.find(l => l.id === activeListId);
+  const activeList = lists.find((l) => l.id === activeListId);
 
   return (
-    <div className={`list-chips-wrapper ${isScrolled ? 'scrolled' : ''}`}>
-      <div className={`chips-row ${isScrolled ? 'chips-row--collapsed' : ''}`} ref={chipsRowRef}>
-        {lists.map(list => (
+    <div
+      className={`list-chips-wrapper ${isScrolled ? 'is-scrolled' : ''}`}
+      ref={wrapperRef}
+    >
+      {/* Ряд чипсов: сворачивается при скролле */}
+      <div
+        className={`chips-row ${isScrolled ? 'chips-row--collapsed' : ''}`}
+        ref={chipsRowRef}
+      >
+        {lists.map((list) => (
           <div key={list.id} className="chip-wrapper">
             {editingId === list.id ? (
               <input
                 type="text"
                 className="chip-input"
                 value={editTitle}
-                onChange={e => setEditTitle(e.target.value)}
+                onChange={(e) => setEditTitle(e.target.value)}
                 onBlur={() => handleRename(list.id)}
-                onKeyDown={e => handleKeyDown(e, 'rename', list.id)}
+                onKeyDown={(e) => handleKeyDown(e, 'rename', list.id)}
                 autoFocus
               />
             ) : (
@@ -211,9 +217,9 @@ export const ListChips: React.FC<Props> = ({
             className="chip-input"
             placeholder="Название"
             value={newTitle}
-            onChange={e => setNewTitle(e.target.value)}
+            onChange={(e) => setNewTitle(e.target.value)}
             onBlur={handleCreate}
-            onKeyDown={e => handleKeyDown(e, 'create')}
+            onKeyDown={(e) => handleKeyDown(e, 'create')}
             autoFocus
           />
         ) : (
@@ -231,13 +237,19 @@ export const ListChips: React.FC<Props> = ({
         )}
       </div>
 
+      {/* Заголовок: появляется при скролле */}
       {activeList && (
-        <div className={`scrolled-header ${isScrolled ? 'scrolled-header--visible' : ''}`}>
-          <span className="scrolled-title">{activeList.title}</span>
-          <span className="scrolled-count">{activeList.items.length}</span>
+        <div
+          className={`scrolled-header ${isScrolled ? 'scrolled-header--visible' : ''}`}
+        >
+          <div className="scrolled-header-inner">
+            <span className="scrolled-title">{activeList.title}</span>
+            <span className="scrolled-count">{activeList.items.length}</span>
+          </div>
         </div>
       )}
 
+      {/* Меню чипса */}
       {menu && (
         <div
           className="chip-menu-overlay"
@@ -257,7 +269,7 @@ export const ListChips: React.FC<Props> = ({
               type="button"
               aria-label="Редактировать список"
               onClick={() => {
-                const target = lists.find(l => l.id === menu.listId);
+                const target = lists.find((l) => l.id === menu.listId);
                 closeMenu();
                 if (target) {
                   setEditingId(target.id);
@@ -274,7 +286,7 @@ export const ListChips: React.FC<Props> = ({
                 type="button"
                 aria-label="Удалить список"
                 onClick={() => {
-                  const target = lists.find(l => l.id === menu.listId);
+                  const target = lists.find((l) => l.id === menu.listId);
                   if (target) handleDelete(target.id, target.title);
                 }}
               >
@@ -288,7 +300,6 @@ export const ListChips: React.FC<Props> = ({
   );
 };
 
-// ChipButton с собственной логикой long press (без хука)
 interface ChipButtonProps {
   list: ShoppingList;
   isActive: boolean;
@@ -296,23 +307,31 @@ interface ChipButtonProps {
   onLongPress: (listId: string, anchor: DOMRect) => void;
 }
 
-const ChipButton: React.FC<ChipButtonProps> = ({ list, isActive, onSelect, onLongPress }) => {
+const ChipButton: React.FC<ChipButtonProps> = ({
+  list,
+  isActive,
+  onSelect,
+  onLongPress,
+}) => {
   const buttonRef = useRef<HTMLButtonElement>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isLongPressRef = useRef(false);
   const startPosRef = useRef<{ x: number; y: number } | null>(null);
 
-  const handlePointerDown = useCallback((e: React.PointerEvent) => {
-    isLongPressRef.current = false;
-    startPosRef.current = { x: e.clientX, y: e.clientY };
+  const handlePointerDown = useCallback(
+    (e: React.PointerEvent) => {
+      isLongPressRef.current = false;
+      startPosRef.current = { x: e.clientX, y: e.clientY };
 
-    timerRef.current = setTimeout(() => {
-      isLongPressRef.current = true;
-      if (buttonRef.current) {
-        onLongPress(list.id, buttonRef.current.getBoundingClientRect());
-      }
-    }, 500);
-  }, [list.id, onLongPress]);
+      timerRef.current = setTimeout(() => {
+        isLongPressRef.current = true;
+        if (buttonRef.current) {
+          onLongPress(list.id, buttonRef.current.getBoundingClientRect());
+        }
+      }, 500);
+    },
+    [list.id, onLongPress]
+  );
 
   const handlePointerMove = useCallback((e: React.PointerEvent) => {
     if (!startPosRef.current) return;
@@ -335,7 +354,6 @@ const ChipButton: React.FC<ChipButtonProps> = ({ list, isActive, onSelect, onLon
       timerRef.current = null;
     }
 
-    // Если это НЕ было долгое нажатие — вызываем обычный клик
     if (!isLongPressRef.current) {
       onSelect();
     }
@@ -363,7 +381,9 @@ const ChipButton: React.FC<ChipButtonProps> = ({ list, isActive, onSelect, onLon
       onPointerLeave={handlePointerLeave}
     >
       {list.title}
-      {list.items.length > 0 && <span className="chip-count">{list.items.length}</span>}
+      {list.items.length > 0 && (
+        <span className="chip-count">{list.items.length}</span>
+      )}
     </button>
   );
 };

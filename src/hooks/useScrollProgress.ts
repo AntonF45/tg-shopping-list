@@ -1,19 +1,51 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, RefObject } from 'react';
 
-export const useScrollProgress = () => {
-  const [scrollY, setScrollY] = useState(0);
+interface UseScrollProgressOptions {
+  threshold?: number; // px, порог срабатывания
+  containerRef?: RefObject<HTMLElement | null>; // опциональный контейнер
+}
+
+export const useScrollProgress = ({
+  threshold = 80,
+  containerRef,
+}: UseScrollProgressOptions = {}) => {
   const [isScrolled, setIsScrolled] = useState(false);
+  const tickingRef = useRef(false);
 
   useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      setScrollY(currentScrollY);
-      setIsScrolled(currentScrollY > 50); // Порог для анимации
+    // Определяем элемент для отслеживания скролла
+    const container = containerRef?.current;
+    const scrollTarget = container ?? window;
+
+    const checkScroll = () => {
+      const scrollY =
+        container?.scrollTop ?? window.scrollY ?? 0;
+      setIsScrolled(scrollY > threshold);
     };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+    const onScroll = () => {
+      // requestAnimationFrame для плавности
+      if (!tickingRef.current) {
+        window.requestAnimationFrame(() => {
+          checkScroll();
+          tickingRef.current = false;
+        });
+        tickingRef.current = true;
+      }
+    };
 
-  return { scrollY, isScrolled };
+    // Первичная проверка
+    checkScroll();
+
+    scrollTarget.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', checkScroll, { passive: true });
+
+    return () => {
+      scrollTarget.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', checkScroll);
+      tickingRef.current = false;
+    };
+  }, [threshold, containerRef]);
+
+  return { isScrolled };
 };
