@@ -16,17 +16,17 @@ export const useLongPress = ({
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isLongPressRef = useRef(false);
   const startPosRef = useRef<{ x: number; y: number } | null>(null);
+  
+  // Используем ref для хранения актуального onClick (избегаем stale closure)
+  const onClickRef = useRef(onClick);
+  onClickRef.current = onClick;
 
-  const start = useCallback((e: React.MouseEvent | React.TouchEvent) => {
-    // Всегда сбрасываем состояние при новом нажатии
+  const start = useCallback((e: React.PointerEvent) => {
     isLongPressRef.current = false;
-    
-    if ('touches' in e) {
-      startPosRef.current = {
-        x: e.touches[0].clientX,
-        y: e.touches[0].clientY,
-      };
-    }
+    startPosRef.current = {
+      x: e.clientX,
+      y: e.clientY,
+    };
 
     timerRef.current = setTimeout(() => {
       isLongPressRef.current = true;
@@ -34,22 +34,11 @@ export const useLongPress = ({
     }, threshold);
   }, [onLongPress, threshold]);
 
-  const move = useCallback((e: React.MouseEvent | React.TouchEvent) => {
+  const move = useCallback((e: React.PointerEvent) => {
     if (!startPosRef.current) return;
 
-    let currentX: number;
-    let currentY: number;
-
-    if ('touches' in e) {
-      currentX = e.touches[0].clientX;
-      currentY = e.touches[0].clientY;
-    } else {
-      currentX = e.clientX;
-      currentY = e.clientY;
-    }
-
-    const deltaX = Math.abs(currentX - startPosRef.current.x);
-    const deltaY = Math.abs(currentY - startPosRef.current.y);
+    const deltaX = Math.abs(e.clientX - startPosRef.current.x);
+    const deltaY = Math.abs(e.clientY - startPosRef.current.y);
 
     if (deltaX > moveThreshold || deltaY > moveThreshold) {
       if (timerRef.current) {
@@ -66,23 +55,18 @@ export const useLongPress = ({
       timerRef.current = null;
     }
     
-    // Вызываем onClick только если это не был long press
-    if (!isLongPressRef.current && onClick) {
-      onClick();
+    if (!isLongPressRef.current && onClickRef.current) {
+      onClickRef.current();
     }
     
-    // Сбрасываем все состояния
     isLongPressRef.current = false;
     startPosRef.current = null;
-  }, [onClick]);
+  }, []);
 
   return {
-    onMouseDown: start,
-    onMouseMove: move,
-    onMouseUp: stop,
-    onMouseLeave: stop,
-    onTouchStart: start,
-    onTouchMove: move,
-    onTouchEnd: stop,
+    onPointerDown: start,
+    onPointerMove: move,
+    onPointerUp: stop,
+    onPointerLeave: stop,
   };
 };

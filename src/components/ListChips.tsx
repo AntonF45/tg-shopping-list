@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef, useCallback } from 'react';
 import { ShoppingList } from '../types/shopping';
 import { triggerHaptic } from '../lib/telegram';
 import { useLongPress } from '../hooks/useLongPress';
@@ -35,35 +35,45 @@ export const ListChips: React.FC<Props> = ({
   const [menu, setMenu] = useState<MenuState | null>(null);
   const [menuBox, setMenuBox] = useState<{ left: number; arrowLeft: number } | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
+  const chipsRowRef = useRef<HTMLDivElement>(null);
 
-  const closeMenu = () => {
+  const closeMenu = useCallback(() => {
     setMenu(null);
     setMenuBox(null);
-  };
+  }, []);
 
-  // Закрытие по клику вне, по скроллу чипсов и по ресайзу
+  // Закрытие меню по клику вне, по скроллу и по ресайзу
   useEffect(() => {
     if (!menu) return;
 
-    const onOutside = (e: MouseEvent | TouchEvent) => {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+    const onOutside = (e: PointerEvent) => {
+      // Проверяем, является ли цель клика чипсом
+      const target = e.target as Node;
+      const isChip = chipsRowRef.current?.contains(target);
+      
+      // Если клик по чипсу — не закрываем меню здесь, пусть чипс сам решит
+      if (isChip) return;
+
+      if (menuRef.current && !menuRef.current.contains(target)) {
         closeMenu();
       }
     };
+
     const onScroll = () => closeMenu();
 
-    document.addEventListener('mousedown', onOutside);
-    document.addEventListener('touchstart', onOutside);
+    // Используем pointerdown вместо touchstart/mousedown для единообразия
+    document.addEventListener('pointerdown', onOutside, { capture: true });
     window.addEventListener('resize', onScroll);
+    window.addEventListener('scroll', onScroll, { passive: true });
 
     return () => {
-      document.removeEventListener('mousedown', onOutside);
-      document.removeEventListener('touchstart', onOutside);
+      document.removeEventListener('pointerdown', onOutside, { capture: true });
       window.removeEventListener('resize', onScroll);
+      window.removeEventListener('scroll', onScroll);
     };
-  }, [menu]);
+  }, [menu, closeMenu]);
 
-  // Clamp меню по краям экрана ПОСЛЕ рендера (измеряем реальную ширину)
+  // Clamp меню по краям экрана
   useLayoutEffect(() => {
     if (!menu || !menuRef.current) return;
 
@@ -78,7 +88,7 @@ export const ListChips: React.FC<Props> = ({
     setMenuBox({ left: clampedLeft, arrowLeft });
   }, [menu]);
 
-  const handleCreate = () => {
+  const handleCreate = useCallback(() => {
     if (!newTitle.trim()) {
       setIsCreating(false);
       return;
@@ -87,9 +97,9 @@ export const ListChips: React.FC<Props> = ({
     setNewTitle('');
     setIsCreating(false);
     triggerHaptic('medium');
-  };
+  }, [newTitle, onCreate]);
 
-  const handleRename = (id: string) => {
+  const handleRename = useCallback((id: string) => {
     if (!editTitle.trim()) {
       setEditingId(null);
       return;
@@ -98,9 +108,9 @@ export const ListChips: React.FC<Props> = ({
     setEditingId(null);
     setEditTitle('');
     triggerHaptic('medium');
-  };
+  }, [editTitle, onRename]);
 
-  const handleDelete = (id: string, title: string) => {
+  const handleDelete = useCallback((id: string, title: string) => {
     closeMenu();
     const tg = window.Telegram?.WebApp;
 
@@ -115,9 +125,9 @@ export const ListChips: React.FC<Props> = ({
       triggerHaptic('heavy');
       onDelete(id);
     }
-  };
+  }, [closeMenu, onDelete]);
 
-  const handleKeyDown = (e: React.KeyboardEvent, action: 'create' | 'rename', id?: string) => {
+  const handleKeyDown = useCallback((e: React.KeyboardEvent, action: 'create' | 'rename', id?: string) => {
     if (e.key === 'Enter') {
       e.preventDefault();
       if (action === 'create') handleCreate();
@@ -131,9 +141,15 @@ export const ListChips: React.FC<Props> = ({
         setEditTitle('');
       }
     }
-  };
+  }, [handleCreate, handleRename]);
 
-  const openMenu = (listId: string, anchor: DOMRect) => {
+  // Обработчик клика по чипсу: закрывает меню И переключает список
+  const handleChipClick = useCallback((listId: string) => {
+    closeMenu();
+    onSelect(listId);
+  }, [closeMenu, onSelect]);
+
+  const openMenu = useCallback((listId: string, anchor: DOMRect) => {
     setMenu({
       listId,
       anchorX: anchor.left + anchor.width / 2,
@@ -141,14 +157,13 @@ export const ListChips: React.FC<Props> = ({
     });
     setMenuBox(null);
     triggerHaptic('medium');
-  };
+  }, []);
 
   const activeList = lists.find(l => l.id === activeListId);
 
   return (
     <div className={`list-chips-wrapper ${isScrolled ? 'scrolled' : ''}`}>
-      {/* Ряд чипсов: сворачивается при скролле */}
-      <div className={`chips-row ${isScrolled ? 'chips-row--collapsed' : ''}`}>
+      <div className={`chips-row ${isScrolled ? 'chips-row--collapsed' : ''}`} ref={chipsRowRef}>
         {lists.map(list => (
           <div key={list.id} className="chip-wrapper">
             {editingId === list.id ? (
@@ -165,7 +180,7 @@ export const ListChips: React.FC<Props> = ({
               <ChipButton
                 list={list}
                 isActive={list.id === activeListId}
-                onSelect={() => onSelect(list.id)}
+                onSelect={() => handleChipClick(list.id)}
                 onLongPress={openMenu}
               />
             )}
@@ -198,7 +213,6 @@ export const ListChips: React.FC<Props> = ({
         )}
       </div>
 
-      {/* Заголовок при скролле: внутри sticky-обёртки, без position: fixed */}
       {activeList && (
         <div className={`scrolled-header ${isScrolled ? 'scrolled-header--visible' : ''}`}>
           <span className="scrolled-title">{activeList.title}</span>
@@ -206,7 +220,6 @@ export const ListChips: React.FC<Props> = ({
         </div>
       )}
 
-      {/* Меню чипса: fixed + clamp по краям экрана */}
       {menu && (
         <div
           className="chip-menu-overlay"
