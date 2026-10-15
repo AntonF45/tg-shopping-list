@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 
 interface Props {
   onAdd: (name: string, qty: string) => void;
+  onFocusChange?: (isFocused: boolean) => void;
 }
 
-export const AddItemForm: React.FC<Props> = ({ onAdd }) => {
+export const AddItemForm: React.FC<Props> = ({ onAdd, onFocusChange }) => {
   const [name, setName] = useState('');
   const [qty, setQty] = useState('');
 
@@ -35,6 +36,9 @@ export const AddItemForm: React.FC<Props> = ({ onAdd }) => {
     setQty(value);
   };
 
+  const handleFocus = () => onFocusChange?.(true);
+  const handleBlur = () => onFocusChange?.(false);
+
   return (
     <form className="add-form" onSubmit={handleSubmit}>
       <div className="input-wrapper">
@@ -43,6 +47,8 @@ export const AddItemForm: React.FC<Props> = ({ onAdd }) => {
           placeholder="Название товара"
           value={name}
           onChange={e => setName(e.target.value)}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
           className="input-name"
           autoFocus
         />
@@ -68,9 +74,11 @@ export const AddItemForm: React.FC<Props> = ({ onAdd }) => {
           type="text"
           inputMode="numeric"
           pattern="[0-9]*"
-          placeholder="0"
+          placeholder="_"
           value={qty}
           onChange={handleQtyChange}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
           className="input-counter"
         />
         <button 

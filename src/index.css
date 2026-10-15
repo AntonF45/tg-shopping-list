@@ -462,7 +462,7 @@ body {
   position: relative;
 }
 
-/* === Плавающие кнопки-острова (стабильные при клавиатуре) === */
+/* === Плавающие кнопки-острова === */
 .floating-actions {
   position: fixed;
   bottom: 20px;
@@ -473,7 +473,16 @@ body {
   width: calc(100% - 32px);
   max-width: 568px;
   z-index: 100;
-  pointer-events: none; /* Пропускаем клики сквозь контейнер */
+  transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s;
+  animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Состояние скрытия при фокусе на инпуте */
+.floating-actions--hidden {
+  opacity: 0;
+  transform: translateX(-50%) translateY(24px);
+  pointer-events: none;
+  visibility: hidden;
 }
 
 .btn-share-island,
@@ -490,7 +499,6 @@ body {
   cursor: pointer;
   box-shadow: 0 8px 24px rgba(26, 47, 35, 0.15);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  pointer-events: auto; /* Возвращаем клики для кнопок */
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
 }
@@ -537,6 +545,18 @@ body {
   line-height: 1;
 }
 
+/* Анимация появления */
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
 /* Адаптация для тёмной темы */
 [data-theme="dark"] .btn-share-island {
   background: rgba(168, 224, 99, 0.9);
@@ -557,22 +577,6 @@ body {
 [data-theme="dark"] .btn-clear-island:hover {
   background: rgba(231, 76, 60, 0.1);
   box-shadow: 0 12px 32px rgba(231, 76, 60, 0.2);
-}
-
-/* Анимация появления кнопок */
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateX(-50%) translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-  }
-}
-
-.floating-actions {
-  animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* === Loading / Error === */

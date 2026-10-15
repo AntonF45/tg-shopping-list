@@ -5,22 +5,25 @@ import { shareList } from '../lib/share';
 interface Props {
   items: ShoppingItem[];
   onClearDone: () => void;
+  isHidden?: boolean;
 }
 
-export const ShareButton: React.FC<Props> = ({ items, onClearDone }) => {
+export const ShareButton: React.FC<Props> = ({ items, onClearDone, isHidden }) => {
   const hasDoneItems = items.some(i => i.isDone);
 
+  if (items.length === 0 && !hasDoneItems) {
+    return null;
+  }
+
   return (
-    <div className="floating-actions">
-      {items.length > 0 && (
-        <button 
-          className="btn-share-island" 
-          onClick={() => shareList(items)}
-        >
-          <span className="btn-icon"></span>
-          <span>Отправить в чат</span>
-        </button>
-      )}
+    <div className={`floating-actions ${isHidden ? 'floating-actions--hidden' : ''}`}>
+      <button 
+        className="btn-share-island" 
+        onClick={() => shareList(items)}
+      >
+        <span className="btn-icon"></span>
+        <span>Отправить</span>
+      </button>
       
       {hasDoneItems && (
         <button className="btn-clear-island" onClick={onClearDone}>
