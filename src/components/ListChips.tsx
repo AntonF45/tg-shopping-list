@@ -42,26 +42,30 @@ export const ListChips: React.FC<Props> = ({
     setMenuBox(null);
   }, []);
 
-  // Закрытие меню по клику вне, по скроллу и по ресайзу
+  // Закрытие меню по клику вне (только если клик НЕ по чипсу)
   useEffect(() => {
     if (!menu) return;
 
     const onOutside = (e: PointerEvent) => {
-      // Проверяем, является ли цель клика чипсом
       const target = e.target as Node;
-      const isChip = chipsRowRef.current?.contains(target);
       
-      // Если клик по чипсу — не закрываем меню здесь, пусть чипс сам решит
-      if (isChip) return;
-
-      if (menuRef.current && !menuRef.current.contains(target)) {
-        closeMenu();
+      // Если клик по чипсам — не закрываем (чипс сам решит)
+      if (chipsRowRef.current?.contains(target)) {
+        return;
       }
+      
+      // Если клик по меню — не закрываем
+      if (menuRef.current?.contains(target)) {
+        return;
+      }
+      
+      // Клик вне — закрываем
+      closeMenu();
     };
 
     const onScroll = () => closeMenu();
 
-    // Используем pointerdown вместо touchstart/mousedown для единообразия
+    // Используем pointerdown для единообразия
     document.addEventListener('pointerdown', onOutside, { capture: true });
     window.addEventListener('resize', onScroll);
     window.addEventListener('scroll', onScroll, { passive: true });
@@ -82,10 +86,16 @@ export const ListChips: React.FC<Props> = ({
     const half = rect.width / 2;
     const vw = window.innerWidth;
 
-    const clampedLeft = Math.min(Math.max(menu.anchorX, half + margin), vw - half - margin);
-    const arrowLeft = half + (menu.anchorX - clampedLeft);
+    // anchorX — это центр чипса, clamp для центра меню
+    const clampedCenter = Math.min(Math.max(menu.anchorX, half + margin), vw - half - margin);
+    
+    // left — это левый край меню (центр - половина ширины)
+    const left = clampedCenter - half;
+    
+    // arrowLeft — позиция стрелки относительно левого края меню
+    const arrowLeft = half + (menu.anchorX - clampedCenter);
 
-    setMenuBox({ left: clampedLeft, arrowLeft });
+    setMenuBox({ left, arrowLeft });
   }, [menu]);
 
   const handleCreate = useCallback(() => {
@@ -143,7 +153,7 @@ export const ListChips: React.FC<Props> = ({
     }
   }, [handleCreate, handleRename]);
 
-  // Обработчик клика по чипсу: закрывает меню И переключает список
+  // Клик по чипсу: закрывает меню И переключает список
   const handleChipClick = useCallback((listId: string) => {
     closeMenu();
     onSelect(listId);
