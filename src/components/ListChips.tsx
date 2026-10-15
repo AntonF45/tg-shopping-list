@@ -6,10 +6,10 @@ import { useScrollProgress } from '../hooks/useScrollProgress';
 interface Props {
   lists: ShoppingList[];
   activeListId: string;
-  onSelect: (id: string) => void;
-  onCreate: (title: string) => void;
-  onRename: (id: string, newTitle: string) => void;
-  onDelete: (id: string) => void;
+  onSelect: (id: string) => void | Promise<void>;
+  onCreate: (title: string) => void | Promise<void>;
+  onRename: (id: string, newTitle: string) => void | Promise<void>;
+  onDelete: (id: string) => void | Promise<void>;
 }
 
 interface MenuState {

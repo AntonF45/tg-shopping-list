@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useShoppingList } from './hooks/useShoppingList';
-import { useScrollProgress } from './hooks/useScrollProgress';
 import { AddItemForm } from './components/AddItemForm';
 import { ItemList } from './components/ItemList';
 import { ShareButton } from './components/ShareButton';
@@ -24,10 +23,7 @@ const App: React.FC = () => {
 
   const [isInputFocused, setIsInputFocused] = useState(false);
   const blurTimerRef = useRef<number | null>(null);
-  const { isScrolled } = useScrollProgress();
 
-  // Debounce 150ms: быстрый переход фокуса между полями не мигает кнопками.
-  // Cleanup в useEffect делает это безопасным при React StrictMode.
   const handleFocusChange = useCallback((focused: boolean) => {
     if (blurTimerRef.current !== null) {
       window.clearTimeout(blurTimerRef.current);
@@ -36,11 +32,9 @@ const App: React.FC = () => {
 
     if (focused) {
       setIsInputFocused(true);
-      console.log('[UI] floating-actions: СКРЫТЫ (фокус на поле)');
     } else {
       blurTimerRef.current = window.setTimeout(() => {
         setIsInputFocused(false);
-        console.log('[UI] floating-actions: ВИДНЫ (фокус потерян)');
       }, 150);
     }
   }, []);
@@ -70,7 +64,6 @@ const App: React.FC = () => {
         onCreate={createList}
         onRename={renameList}
         onDelete={deleteList}
-        isScrolled={isScrolled}
       />
 
       <main className="app-main">
