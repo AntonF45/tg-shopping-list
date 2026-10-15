@@ -4,7 +4,6 @@ declare global {
   }
 }
 
-// Mossforge цвета для шапки
 const MOSS_LIGHT = '#F5F3EC';
 const MOSS_DARK = '#1A2F23';
 
@@ -14,10 +13,10 @@ const applyTheme = () => {
 
   const isDark = tg.colorScheme === 'dark';
   
-  // 1. Устанавливаем атрибут data-theme на <html> — это ключ к работе CSS
+  // Устанавливаем атрибут data-theme на <html>
   document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
   
-  // 2. Красим системную шапку Telegram в цвет нашего приложения
+  // Красим системную шапку Telegram
   const headerColor = isDark ? MOSS_DARK : MOSS_LIGHT;
   tg.setHeaderColor(headerColor);
   tg.setBackgroundColor(headerColor);
@@ -32,11 +31,6 @@ export const initTelegram = () => {
   
   // Применяем тему при запуске
   applyTheme();
-  
-  // Слушаем переключение темы пользователем
-  tg.onEvent('themeChanged', () => {
-    applyTheme();
-  });
 };
 
 export const triggerHaptic = (type: 'light' | 'medium' | 'heavy' = 'light') => {
