@@ -8,7 +8,8 @@ export type AnalyticsEvent =
   | 'item_marked_done'
   | 'item_removed'
   | 'list_cleared'
-  | 'list_shared';
+  | 'list_shared'
+  | 'list_created';
 
 export interface AnalyticsPayload {
   totalItems?: number;

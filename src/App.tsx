@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useShoppingList } from './hooks/useShoppingList';
 import { AddItemForm } from './components/AddItemForm';
 import { ItemList } from './components/ItemList';
