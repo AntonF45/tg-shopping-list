@@ -11,7 +11,8 @@ export const useLongPress = ({
   onClick,
   threshold = 500,
 }: UseLongPressOptions) => {
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  // В браузере setTimeout возвращает number, а не NodeJS.Timeout
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isLongPressRef = useRef(false);
 
   const start = useCallback(() => {
@@ -25,6 +26,7 @@ export const useLongPress = ({
   const stop = useCallback(() => {
     if (timerRef.current) {
       clearTimeout(timerRef.current);
+      timerRef.current = null;
     }
     if (!isLongPressRef.current && onClick) {
       onClick();
