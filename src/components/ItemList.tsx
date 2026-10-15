@@ -17,23 +17,11 @@ export const ItemList: React.FC<Props> = ({ items, onToggle, onRemove }) => {
     );
   }
 
-  const activeItems = items.filter(i => !i.isDone);
-  const doneItems = items.filter(i => i.isDone);
-
   return (
     <div className="item-list">
-      {activeItems.map(item => (
+      {items.map(item => (
         <ItemRow key={item.id} item={item} onToggle={onToggle} onRemove={onRemove} />
       ))}
-      
-      {doneItems.length > 0 && (
-        <>
-          <div className="section-divider">Куплено</div>
-          {doneItems.map(item => (
-            <ItemRow key={item.id} item={item} onToggle={onToggle} onRemove={onRemove} />
-          ))}
-        </>
-      )}
     </div>
   );
 };

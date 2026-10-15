@@ -10,23 +10,22 @@ interface Props {
 
 export const ItemRow: React.FC<Props> = ({ item, onToggle, onRemove }) => {
   return (
-    <div className={`item-row ${item.isDone ? 'done' : ''}`}>
-      <label className="checkbox-container">
-        <input
-          type="checkbox"
-          checked={item.isDone}
-          onChange={() => onToggle(item.id)}
-        />
-        <span className="checkmark"></span>
-      </label>
-      
-      <div className="item-info" onClick={() => onToggle(item.id)}>
+    <div className="checklist-item">
+      <input
+        type="checkbox"
+        checked={item.isDone}
+        onChange={() => {
+          triggerHaptic('light');
+          onToggle(item.id);
+        }}
+        id={`item-${item.id}`}
+      />
+      <label htmlFor={`item-${item.id}`} className="item-label">
         <span className="item-name">{item.name}</span>
-        {item.qty && <span className="item-qty">{item.qty}</span>}
-      </div>
-      
+        {item.qty && <span className="item-qty">× {item.qty}</span>}
+      </label>
       <button 
-        className="btn-remove" 
+        className="btn-remove-small" 
         onClick={() => {
           triggerHaptic('light');
           onRemove(item.id);

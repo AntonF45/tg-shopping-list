@@ -1,52 +1,70 @@
 import React, { useState } from 'react';
-import { Category } from '../types/shopping';
 
 interface Props {
-  onAdd: (name: string, qty: string, category: Category) => void;
+  onAdd: (name: string, qty: string) => void;
 }
 
 export const AddItemForm: React.FC<Props> = ({ onAdd }) => {
   const [name, setName] = useState('');
   const [qty, setQty] = useState('');
-  const [category, setCategory] = useState<Category>('groceries');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
-    onAdd(name, qty, category);
+    onAdd(name, qty);
     setName('');
     setQty('');
   };
 
+  const incrementQty = () => {
+    const num = parseInt(qty) || 0;
+    setQty((num + 1).toString());
+  };
+
+  const decrementQty = () => {
+    const num = parseInt(qty) || 0;
+    if (num > 0) {
+      setQty((num - 1).toString());
+    } else {
+      setQty('');
+    }
+  };
+
+  const handleQtyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.replace(/[^0-9]/g, '');
+    setQty(value);
+  };
+
   return (
     <form className="add-form" onSubmit={handleSubmit}>
-      <input
-        type="text"
-        placeholder="Название товара"
-        value={name}
-        onChange={e => setName(e.target.value)}
-        className="input-name"
-        autoFocus
-      />
-      <div className="form-row">
+      <div className="input-row">
         <input
           type="text"
-          placeholder="Кол-во (напр. 2 л)"
+          placeholder="Название товара"
+          value={name}
+          onChange={e => setName(e.target.value)}
+          className="input-name"
+          autoFocus
+        />
+        <button type="submit" className="btn-add-plus" disabled={!name.trim()}>
+          +
+        </button>
+      </div>
+      
+      <div className="qty-row">
+        <button type="button" className="btn-qty" onClick={decrementQty}>
+          −
+        </button>
+        <input
+          type="text"
+          inputMode="numeric"
+          pattern="[0-9]*"
+          placeholder="Кол-во"
           value={qty}
-          onChange={e => setQty(e.target.value)}
+          onChange={handleQtyChange}
           className="input-qty"
         />
-        <select 
-          value={category} 
-          onChange={e => setCategory(e.target.value as Category)}
-          className="input-category"
-        >
-          <option value="groceries">Еда</option>
-          <option value="household">Быт</option>
-          <option value="pharmacy">Аптека</option>
-          <option value="other">Другое</option>
-        </select>
-        <button type="submit" className="btn-add" disabled={!name.trim()}>
+        <button type="button" className="btn-qty" onClick={incrementQty}>
           +
         </button>
       </div>

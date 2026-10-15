@@ -67,5 +67,14 @@ export const useShoppingList = () => {
     logEvent('list_cleared');
   }, []);
 
-  return { list, isLoading, addItem, toggleItem, removeItem, clearDone };
+    const updateQty = useCallback(async (id: string, qty: string) => {
+    const updatedItem = await localStorageRepository.updateQty(id, qty);
+    setList(prev => {
+      if (!prev) return null;
+      const newItems = prev.items.map(i => i.id === id ? updatedItem : i);
+      return { ...prev, items: newItems };
+    });
+  }, []);
+
+    return { list, isLoading, addItem, toggleItem, removeItem, clearDone, updateQty };
 };

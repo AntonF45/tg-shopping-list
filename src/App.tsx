@@ -23,13 +23,11 @@ const App: React.FC = () => {
       </header>
       
       <main className="app-main">
-        <AddItemForm onAdd={(name, qty, category) => addItem({ name, qty, category })} />
+        <AddItemForm onAdd={(name, qty) => addItem({ name, qty })} />
         <ItemList items={list.items} onToggle={toggleItem} onRemove={removeItem} />
       </main>
       
-      <footer className="app-footer">
-        <ShareButton items={list.items} onClearDone={clearDone} />
-      </footer>
+      <ShareButton items={list.items} onClearDone={clearDone} />
     </div>
   );
 };

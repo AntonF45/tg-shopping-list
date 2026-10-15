@@ -71,6 +71,24 @@ export const initTelegram = () => {
       applyTheme();
     }
   });
+
+    // Отслеживаем появление клавиатуры и поднимаем кнопки
+  const floatingActions = document.querySelector('.floating-actions');
+  if (floatingActions && tg) {
+    tg.onEvent('viewportChanged', (e: any) => {
+      if (e.isStateStable) {
+        const heightDiff = tg.viewportHeight - window.innerHeight;
+        if (heightDiff > 100) {
+          // Клавиатура открыта
+          (floatingActions as HTMLElement).style.bottom = '20px';
+        } else {
+          // Клавиатура закрыта
+          (floatingActions as HTMLElement).style.bottom = '20px';
+        }
+      }
+    });
+  }
+  
 };
 
 export const triggerHaptic = (type: 'light' | 'medium' | 'heavy' = 'light') => {

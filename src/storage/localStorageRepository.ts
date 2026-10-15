@@ -81,12 +81,6 @@ export const localStorageRepository: ShoppingListRepository = {
     item.updatedAt = Math.floor(Date.now() / 1000);
     list.updatedAt = item.updatedAt;
     
-    // Сортировка: активные сверху, купленные снизу
-    list.items.sort((a, b) => {
-      if (a.isDone === b.isDone) return b.createdAt - a.createdAt;
-      return a.isDone ? 1 : -1;
-    });
-    
     await storageAdapter.saveList(list);
     return item;
   },
@@ -103,5 +97,18 @@ export const localStorageRepository: ShoppingListRepository = {
     list.items = list.items.filter(i => !i.isDone);
     list.updatedAt = Math.floor(Date.now() / 1000);
     await storageAdapter.saveList(list);
+  },
+
+  async updateQty(id: string, qty: string): Promise<ShoppingItem> {
+    const list = await storageAdapter.getList();
+    const item = list.items.find(i => i.id === id);
+    if (!item) throw new Error('Item not found');
+    
+    item.qty = qty;
+    item.updatedAt = Math.floor(Date.now() / 1000);
+    list.updatedAt = item.updatedAt;
+    
+    await storageAdapter.saveList(list);
+    return item;
   }
 };
