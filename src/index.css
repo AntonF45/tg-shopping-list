@@ -695,11 +695,11 @@ body {
   width: 120px;
 }
 
-/* === Меню чипса (тултип поверх всего) === */
+/* === Меню чипса (тултип под чипсом) === */
 .chip-menu-overlay {
   position: fixed;
   z-index: 1000;
-  transform: translate(-50%, -100%);
+  transform: translate(-50%, 0);
   pointer-events: none;
   animation: menuAppear 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -716,17 +716,18 @@ body {
   position: relative;
 }
 
-.chip-menu::after {
+/* Стрелочка сверху, указывает на чипс */
+.chip-menu::before {
   content: '';
   position: absolute;
-  bottom: -8px;
+  top: -8px;
   left: 50%;
   transform: translateX(-50%);
   width: 0;
   height: 0;
   border-left: 8px solid transparent;
   border-right: 8px solid transparent;
-  border-top: 8px solid var(--moss-cream-dark);
+  border-bottom: 8px solid var(--moss-cream-dark);
 }
 
 [data-theme="dark"] .chip-menu {
@@ -735,8 +736,8 @@ body {
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
 }
 
-[data-theme="dark"] .chip-menu::after {
-  border-top-color: var(--moss-evergreen-light);
+[data-theme="dark"] .chip-menu::before {
+  border-bottom-color: var(--moss-evergreen-light);
 }
 
 .chip-menu-item {
@@ -792,11 +793,11 @@ body {
 @keyframes menuAppear {
   from {
     opacity: 0;
-    transform: translate(-50%, -90%);
+    transform: translate(-50%, -10px);
   }
   to {
     opacity: 1;
-    transform: translate(-50%, -100%);
+    transform: translate(-50%, 0);
   }
 }
 
