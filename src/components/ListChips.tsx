@@ -24,27 +24,37 @@ export const ListChips: React.FC<Props> = ({
 }) => {
   const [isCreating, setIsCreating] = useState(false);
   const [newTitle, setNewTitle] = useState('');
-  const [menuOpenId, setMenuOpenId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState('');
+  
+  // Состояние для меню (позиция + id списка)
+  const [menuPosition, setMenuPosition] = useState<{ left: number; top: number } | null>(null);
+  const [menuListId, setMenuListId] = useState<string | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
   // Закрытие меню при клике вне
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
+    const handleClickOutside = (event: MouseEvent | TouchEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        setMenuOpenId(null);
+        closeMenu();
       }
     };
 
-    if (menuOpenId) {
+    if (menuListId) {
       document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('touchstart', handleClickOutside);
     }
 
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
     };
-  }, [menuOpenId]);
+  }, [menuListId]);
+
+  const closeMenu = () => {
+    setMenuPosition(null);
+    setMenuListId(null);
+  };
 
   const handleCreate = () => {
     if (!newTitle.trim()) {
@@ -69,7 +79,7 @@ export const ListChips: React.FC<Props> = ({
   };
 
   const handleDelete = (id: string, title: string) => {
-    setMenuOpenId(null);
+    closeMenu();
     const tg = window.Telegram?.WebApp;
     
     if (tg?.showConfirm) {
@@ -125,23 +135,24 @@ export const ListChips: React.FC<Props> = ({
                 <ChipWithMenu
                   list={list}
                   isActive={list.id === activeListId}
-                  isMenuOpen={menuOpenId === list.id}
-                  onSelect={() => {
-                    triggerHaptic('light');
-                    onSelect(list.id);
-                  }}
-                  onLongPress={() => {
-                    setMenuOpenId(list.id);
+                  isMenuOpen={menuListId === list.id}
+                  onSelect={() => onSelect(list.id)}
+                  onLongPress={(button) => {
+                    const rect = button.getBoundingClientRect();
+                    setMenuPosition({
+                      left: rect.left + rect.width / 2,
+                      top: rect.top - 8,
+                    });
+                    setMenuListId(list.id);
                     triggerHaptic('medium');
                   }}
                   onEdit={() => {
-                    setMenuOpenId(null);
+                    closeMenu();
                     setEditingId(list.id);
                     setEditTitle(list.title);
                     triggerHaptic('light');
                   }}
                   onDelete={() => handleDelete(list.id, list.title)}
-                  menuRef={menuRef}
                 />
               )}
             </div>
@@ -173,6 +184,47 @@ export const ListChips: React.FC<Props> = ({
           )}
         </div>
       </div>
+
+      {/* Меню поверх всего */}
+      {menuPosition && menuListId && (
+        <div
+          className="chip-menu-overlay"
+          style={{
+            left: menuPosition.left,
+            top: menuPosition.top,
+          }}
+        >
+          <div className="chip-menu" ref={menuRef}>
+            <button
+              className="chip-menu-item"
+              onClick={() => {
+                const list = lists.find(l => l.id === menuListId);
+                if (list) {
+                  setEditingId(list.id);
+                  setEditTitle(list.title);
+                }
+                closeMenu();
+                triggerHaptic('light');
+              }}
+              type="button"
+            >
+              <span className="menu-icon">✏️</span>
+            </button>
+            {lists.length > 1 && (
+              <button
+                className="chip-menu-item chip-menu-delete"
+                onClick={() => {
+                  const list = lists.find(l => l.id === menuListId);
+                  if (list) handleDelete(list.id, list.title);
+                }}
+                type="button"
+              >
+                <span className="menu-icon">🗑</span>
+              </button>
+            )}
+          </div>
+        </div>
+      )}
       
       {/* Анимированный заголовок при скролле */}
       {isScrolled && activeList && (
@@ -185,69 +237,45 @@ export const ListChips: React.FC<Props> = ({
   );
 };
 
-// Отдельный компонент для чипса с меню
 interface ChipWithMenuProps {
   list: ShoppingList;
   isActive: boolean;
   isMenuOpen: boolean;
   onSelect: () => void;
-  onLongPress: () => void;
+  onLongPress: (button: HTMLButtonElement) => void;
   onEdit: () => void;
   onDelete: () => void;
-  menuRef: React.RefObject<HTMLDivElement>;
 }
 
 const ChipWithMenu: React.FC<ChipWithMenuProps> = ({
   list,
   isActive,
-  isMenuOpen,
   onSelect,
   onLongPress,
-  onEdit,
-  onDelete,
-  menuRef,
 }) => {
+  const buttonRef = useRef<HTMLButtonElement>(null);
+
   const longPressHandlers = useLongPress({
-    onLongPress: onLongPress,
-    onClick: onSelect,
+    onLongPress: () => {
+      if (buttonRef.current) {
+        onLongPress(buttonRef.current);
+      }
+    },
+    onClick: onSelect, // Без вибрации — только визуальная обратная связь
     threshold: 500,
   });
 
   return (
-    <>
-      <button
-        className={`list-chip ${isActive ? 'active' : ''}`}
-        {...longPressHandlers}
-        type="button"
-      >
-        {list.title}
-        {list.items.length > 0 && (
-          <span className="chip-count">{list.items.length}</span>
-        )}
-      </button>
-
-      {isMenuOpen && (
-        <div className="chip-menu" ref={menuRef}>
-          <button
-            className="chip-menu-item"
-            onClick={onEdit}
-            type="button"
-          >
-            <span className="menu-icon">✏️</span>
-            <span>Редактировать</span>
-          </button>
-          {list.items.length === 0 && (
-            <button
-              className="chip-menu-item chip-menu-delete"
-              onClick={onDelete}
-              type="button"
-            >
-              <span className="menu-icon">🗑</span>
-              <span>Удалить</span>
-            </button>
-          )}
-        </div>
+    <button
+      ref={buttonRef}
+      className={`list-chip ${isActive ? 'active' : ''}`}
+      {...longPressHandlers}
+      type="button"
+    >
+      {list.title}
+      {list.items.length > 0 && (
+        <span className="chip-count">{list.items.length}</span>
       )}
-    </>
+    </button>
   );
 };
