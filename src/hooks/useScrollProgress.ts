@@ -1,30 +1,29 @@
 import { useState, useEffect, useRef, RefObject } from 'react';
 
 interface UseScrollProgressOptions {
-  threshold?: number; // px, порог срабатывания
-  containerRef?: RefObject<HTMLElement | null>; // опциональный контейнер
+  threshold?: number;
+  containerRef?: RefObject<HTMLElement | null>;
 }
 
 export const useScrollProgress = ({
-  threshold = 80,
+  threshold = 60,
   containerRef,
 }: UseScrollProgressOptions = {}) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const tickingRef = useRef(false);
 
   useEffect(() => {
-    // Определяем элемент для отслеживания скролла
-    const container = containerRef?.current;
-    const scrollTarget = container ?? window;
-
     const checkScroll = () => {
-      const scrollY =
-        container?.scrollTop ?? window.scrollY ?? 0;
-      setIsScrolled(scrollY > threshold);
+      // Проверяем скролл у window (основной источник в TMA)
+      const scrollY = window.scrollY || window.pageYOffset || 0;
+      const shouldScroll = scrollY > threshold;
+      
+      console.log('[Scroll] scrollY:', scrollY, 'threshold:', threshold, 'isScrolled:', shouldScroll);
+      
+      setIsScrolled(shouldScroll);
     };
 
     const onScroll = () => {
-      // requestAnimationFrame для плавности
       if (!tickingRef.current) {
         window.requestAnimationFrame(() => {
           checkScroll();
@@ -37,12 +36,22 @@ export const useScrollProgress = ({
     // Первичная проверка
     checkScroll();
 
-    scrollTarget.addEventListener('scroll', onScroll, { passive: true });
+    // Слушаем скролл у window (работает в 99% случаев в TMA)
+    window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', checkScroll, { passive: true });
 
+    // Дополнительно слушаем скролл у containerRef, если он есть
+    const container = containerRef?.current;
+    if (container) {
+      container.addEventListener('scroll', onScroll, { passive: true });
+    }
+
     return () => {
-      scrollTarget.removeEventListener('scroll', onScroll);
+      window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', checkScroll);
+      if (container) {
+        container.removeEventListener('scroll', onScroll);
+      }
       tickingRef.current = false;
     };
   }, [threshold, containerRef]);
