@@ -2,7 +2,7 @@ import { ShoppingItem } from '../types/shopping';
 
 interface ShareOptions {
   listTitle?: string;
-  includeDone?: boolean; // Включать ли купленные товары (по умолчанию да)
+  includeDone?: boolean;
 }
 
 export const shareList = async (
@@ -16,7 +16,6 @@ export const shareList = async (
     : items.filter(i => !i.isDone);
 
   if (itemsToShare.length === 0) {
-    // Если нет товаров для отправки — показываем уведомление
     const tg = window.Telegram?.WebApp;
     if (tg?.showAlert) {
       tg.showAlert('Список пуст');
@@ -28,19 +27,15 @@ export const shareList = async (
 
   // Формируем текст сообщения
   const lines: string[] = [];
-
-  // Заголовок
   lines.push(`🛒 Список покупок: ${listTitle}`);
   lines.push('');
 
-  // Товары
   itemsToShare.forEach(item => {
     const qty = item.qty ? ` × ${item.qty}` : '';
     const doneMark = item.isDone ? ' ✓' : '';
     lines.push(`— ${item.name}${qty}${doneMark}`);
   });
 
-  // Разделитель и статистика
   const doneCount = items.filter(i => i.isDone).length;
   const totalCount = items.length;
 
@@ -50,20 +45,37 @@ export const shareList = async (
 
   const text = lines.join('\n');
 
-  // Отправка через Telegram WebApp
-  const tg = window.Telegram?.WebApp;
-
-  if (tg?.switchInlineQuery) {
-    // Отправка в выбранный чат (inline mode)
+  // Способ 1: Нативный share API (мобильные устройства)
+  if (navigator.share) {
     try {
-      tg.switchInlineQuery(text, ['users', 'groups', 'channels']);
+      await navigator.share({
+        title: `Список покупок: ${listTitle}`,
+        text: text,
+      });
       return;
-    } catch {
-      // Fallback
+    } catch (err) {
+      // Пользователь отменил share или ошибка — продолжаем к fallback
+      if ((err as Error).name === 'AbortError') {
+        return; // Пользователь отменил — ничего не делаем
+      }
+      console.warn('navigator.share failed:', err);
     }
   }
 
-  // Fallback: копирование в буфер обмена
+  // Способ 2: Telegram WebApp openTelegramLink (десктоп)
+  const tg = window.Telegram?.WebApp;
+  if (tg?.openTelegramLink) {
+    try {
+      // Открываем диалог share с предзаполненным текстом
+      const encodedText = encodeURIComponent(text);
+      tg.openTelegramLink(`https://t.me/share/url?url=&text=${encodedText}`);
+      return;
+    } catch (err) {
+      console.warn('openTelegramLink failed:', err);
+    }
+  }
+
+  // Способ 3: Копирование в буфер обмена
   try {
     await navigator.clipboard.writeText(text);
     if (tg?.showAlert) {
