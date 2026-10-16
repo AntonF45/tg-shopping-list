@@ -29,3 +29,8 @@ export interface AddItemInput {
   qty?: string;
   category?: Category;
 }
+
+export interface AddItemResult {
+  item: ShoppingItem;
+  wasDuplicate: boolean;
+}

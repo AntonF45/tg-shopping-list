@@ -4,12 +4,14 @@ import { AddItemForm } from './components/AddItemForm';
 import { ItemList } from './components/ItemList';
 import { ShareButton } from './components/ShareButton';
 import { ListChips } from './components/ListChips';
+import { Toast } from './components/Toast';
 
 const App: React.FC = () => {
   const {
     list,
     allLists,
     activeListId,
+    recentItems,
     isLoading,
     addItem,
     toggleItem,
@@ -22,6 +24,7 @@ const App: React.FC = () => {
   } = useShoppingList();
 
   const [isInputFocused, setIsInputFocused] = useState(false);
+  const [toast, setToast] = useState<{ message: string } | null>(null);
   const blurTimerRef = useRef<number | null>(null);
 
   const handleFocusChange = useCallback((focused: boolean) => {
@@ -47,6 +50,16 @@ const App: React.FC = () => {
     };
   }, []);
 
+  const handleAdd = useCallback(
+    async (name: string, qty: string) => {
+      const result = await addItem({ name, qty });
+      if (result.wasDuplicate) {
+        setToast({ message: 'Товар уже в списке — количество увеличено' });
+      }
+    },
+    [addItem]
+  );
+
   if (isLoading) {
     return <div className="loading">Загрузка...</div>;
   }
@@ -68,10 +81,15 @@ const App: React.FC = () => {
 
       <main className="app-main">
         <AddItemForm
-          onAdd={(name, qty) => addItem({ name, qty })}
+          onAdd={handleAdd}
           onFocusChange={handleFocusChange}
+          recentItems={recentItems}
         />
-        <ItemList items={list.items} onToggle={toggleItem} onRemove={removeItem} />
+        <ItemList
+          items={list.items}
+          onToggle={toggleItem}
+          onRemove={removeItem}
+        />
       </main>
 
       <ShareButton
@@ -79,6 +97,13 @@ const App: React.FC = () => {
         onClearDone={clearDone}
         isHidden={isInputFocused}
       />
+
+      {toast && (
+        <Toast
+          message={toast.message}
+          onClose={() => setToast(null)}
+        />
+      )}
     </div>
   );
 };

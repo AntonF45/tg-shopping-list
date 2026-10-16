@@ -14,9 +14,11 @@ export interface ShoppingListRepository {
   createList(title: string): Promise<ShoppingList>;
   deleteList(id: string): Promise<void>;
   renameList(id: string, newTitle: string): Promise<void>;
-  addItem(input: AddItemInput): Promise<ShoppingItem>;
+  addItem(input: AddItemInput): Promise<AddItemResult>;
   toggleItem(id: string): Promise<ShoppingItem>;
   removeItem(id: string): Promise<void>;
   clearDone(): Promise<void>;
   updateQty(id: string, qty: string): Promise<ShoppingItem>;
+  getRecentItems(): Promise<string[]>;
+  addRecentItem(name: string): Promise<void>;
 }

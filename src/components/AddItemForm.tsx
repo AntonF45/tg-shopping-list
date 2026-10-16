@@ -1,18 +1,19 @@
 import React, { useState } from 'react';
 
 interface Props {
-  onAdd: (name: string, qty: string) => void;
+  onAdd: (name: string, qty: string) => Promise<{ wasDuplicate: boolean }>;
   onFocusChange?: (isFocused: boolean) => void;
+  recentItems: string[];
 }
 
 export const AddItemForm: React.FC<Props> = ({ onAdd, onFocusChange }) => {
   const [name, setName] = useState('');
   const [qty, setQty] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
-    onAdd(name, qty);
+    await onAdd(name, qty);
     setName('');
     setQty('');
   };
@@ -59,6 +60,12 @@ export const AddItemForm: React.FC<Props> = ({ onAdd, onFocusChange }) => {
           </svg>
         </button>
       </div>
+
+      <datalist id="recent-items-list">
+        {recentItems.map(item => (
+          <option key={item} value={item} />
+        ))}
+      </datalist>
       
       <div className="qty-counter">
         <button 
@@ -74,7 +81,7 @@ export const AddItemForm: React.FC<Props> = ({ onAdd, onFocusChange }) => {
           type="text"
           inputMode="numeric"
           pattern="[0-9]*"
-          placeholder="_"
+          placeholder="0"
           value={qty}
           onChange={handleQtyChange}
           onFocus={handleFocus}
