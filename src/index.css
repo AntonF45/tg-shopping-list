@@ -146,15 +146,15 @@ input {
   position: sticky;
   top: 0;
   z-index: 40;
-  padding: var(--safe-top, 0px) 0 8px 0;
+  padding: var(--safe-top, 0px) 0 var(--space-2) 0;
   background: transparent; /* Убран фон */
 }
 
 /* Ряд чипсов с горизонтальным скроллом */
 .chips-row {
   display: flex;
-  gap: 8px;
-  padding: 4px;
+  gap: var(--space-2);
+  padding: var(--space-1);
   overflow-x: auto;
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
@@ -258,9 +258,9 @@ input {
   display: flex;
   align-items: center;
   gap: var(--space-1);
-  padding: 6px;
+  padding: var(--space-1);
   background: var(--surface);
-  border: 1px solid var(--border);
+  border: var(--border-width) solid var(--border);
   border-radius: var(--radius-pill);
   box-shadow: var(--shadow-1);
   transition: border-color 0.2s, box-shadow 0.2s;
@@ -437,6 +437,7 @@ input {
   }
 }
 
+/* ---------- 6. ЧЕК-ЛИСТ ---------- */
 .item-list {
   display: flex;
   flex-direction: column;
@@ -444,17 +445,6 @@ input {
   background: var(--surface);
   border: var(--border-width) solid var(--border);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-1);
-}
-
-/* ---------- 6. ЧЕК-ЛИСТ ---------- */
-.item-list {
-  display: flex;
-  flex-direction: column;
-  padding: 4px var(--space-3);
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
   box-shadow: var(--shadow-1);
 }
 
@@ -554,7 +544,7 @@ input {
   text-align: center;
   color: var(--text-muted);
   background: var(--surface);
-  border: 1px dashed var(--border);
+  border: var(--border-width) dashed var(--border);
   border-radius: var(--radius-md);
 }
 
@@ -618,7 +608,7 @@ input {
 .btn-clear-island {
   background: var(--surface);
   color: var(--text-muted);
-  border: 1px solid var(--border);
+  border: var(--border-width) solid var(--border);
 }
 
 .btn-clear-island:active {
@@ -639,10 +629,10 @@ input {
   position: relative;
   display: flex;
   gap: var(--space-2);
-  padding: 10px;
+  padding: var(--space-2);
   pointer-events: auto;
   background: var(--surface);
-  border: 1px solid var(--border);
+  border: var(--border-width) solid var(--border);
   border-radius: 20px;
   box-shadow: var(--shadow-2);
 }
@@ -655,21 +645,21 @@ input {
   width: 12px;
   height: 12px;
   background: var(--surface);
-  border-left: 1px solid var(--border);
-  border-top: 1px solid var(--border);
+  border-left: var(--border-width) solid var(--border);
+  border-top: var(--border-width) solid var(--border);
   transform: translateX(-50%) rotate(45deg);
 }
 
 .chip-menu-item {
-  width: 48px;
-  height: 48px;
+  width: var(--tap);
+  height: var(--tap);
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
   background: var(--surface-2);
   color: var(--text);
-  font-size: 20px;
+  font-size: var(--text-lg);
   transition: transform 0.15s, background-color 0.2s, color 0.2s;
 }
 
@@ -705,7 +695,7 @@ input {
   min-height: 100dvh;
   background: var(--bg);
   color: var(--text-muted);
-  font-size: 16px;
+  font-size: var(--text-base);
 }
 
 /* ---------- 10. АДАПТИВНОСТЬ И ДОСТУПНОСТЬ ---------- */
@@ -714,21 +704,17 @@ input {
     --space-3: 12px;
   }
 
-  .scrolled-title {
-    font-size: 18px;
-  }
-
   .list-chip {
-    min-height: 36px;
-    padding: 7px 12px;
-    font-size: 13px;
+    min-height: var(--tap-sm);
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--text-sm);
   }
 
   .btn-share-island,
   .btn-clear-island {
-    min-height: 48px;
-    padding: 12px 18px;
-    font-size: 14px;
+    min-height: calc(var(--tap) + 4px);
+    padding: var(--space-3) var(--space-4);
+    font-size: var(--text-sm);
   }
 }
 
