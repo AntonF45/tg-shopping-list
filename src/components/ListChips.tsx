@@ -34,13 +34,34 @@ export const ListChips: React.FC<Props> = ({
 
   const menuRef = useRef<HTMLDivElement>(null);
   const chipsRowRef = useRef<HTMLDivElement>(null);
+  const isFirstRender = useRef(true);
 
   const closeMenu = useCallback(() => {
     setMenu(null);
     setMenuBox(null);
   }, []);
 
-  // Закрытие меню по клику вне и по скроллу
+  // Прокрутка активного чипса при загрузке приложения
+  useEffect(() => {
+    if (activeListId && chipsRowRef.current && isFirstRender.current) {
+      const timer = setTimeout(() => {
+        const activeChip = chipsRowRef.current?.querySelector(
+          `[data-list-id="${activeListId}"]`
+        );
+        if (activeChip) {
+          activeChip.scrollIntoView({
+            behavior: 'instant',
+            block: 'nearest',
+            inline: 'center',
+          });
+        }
+        isFirstRender.current = false;
+      }, 100);
+
+      return () => clearTimeout(timer);
+    }
+  }, [activeListId]);
+
   useEffect(() => {
     if (!menu) return;
 
@@ -57,7 +78,6 @@ export const ListChips: React.FC<Props> = ({
     window.addEventListener('resize', onScroll);
     window.addEventListener('scroll', onScroll, { passive: true });
 
-    // Закрытие меню при горизонтальном скролле чипсов
     if (chipsRowRef.current) {
       chipsRowRef.current.addEventListener('scroll', onScroll, { passive: true });
     }
@@ -78,7 +98,10 @@ export const ListChips: React.FC<Props> = ({
     const half = rect.width / 2;
     const vw = window.innerWidth;
 
-    const clampedCenter = Math.min(Math.max(menu.anchorX, half + margin), vw - half - margin);
+    const clampedCenter = Math.min(
+      Math.max(menu.anchorX, half + margin),
+      vw - half - margin
+    );
     const left = clampedCenter - half;
     const arrowLeft = half + (menu.anchorX - clampedCenter);
 
@@ -169,7 +192,6 @@ export const ListChips: React.FC<Props> = ({
 
   return (
     <div className="list-chips-wrapper">
-      {/* Ряд чипсов с горизонтальным скроллом */}
       <div className="chips-row" ref={chipsRowRef}>
         {lists.map((list) => (
           <div key={list.id} className="chip-wrapper">
@@ -232,7 +254,6 @@ export const ListChips: React.FC<Props> = ({
         )}
       </div>
 
-      {/* Меню чипса */}
       {menu && (
         <div
           className="chip-menu-overlay"
@@ -273,7 +294,7 @@ export const ListChips: React.FC<Props> = ({
                   if (target) handleDelete(target.id, target.title);
                 }}
               >
-                🗑
+                
               </button>
             )}
           </div>
@@ -283,7 +304,6 @@ export const ListChips: React.FC<Props> = ({
   );
 };
 
-// ChipButton с логикой long press
 interface ChipButtonProps {
   list: ShoppingList;
   isActive: boolean;
@@ -336,7 +356,6 @@ const ChipButton: React.FC<ChipButtonProps> = ({ list, isActive, onSelect, onLon
     if (!isLongPressRef.current) {
       onSelect();
       
-      // Прокручиваем чипс в видимую область
       if (buttonRef.current) {
         buttonRef.current.scrollIntoView({
           behavior: 'smooth',
@@ -363,6 +382,7 @@ const ChipButton: React.FC<ChipButtonProps> = ({ list, isActive, onSelect, onLon
       ref={buttonRef}
       className={`list-chip ${isActive ? 'active' : ''}`}
       type="button"
+      data-list-id={list.id}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
