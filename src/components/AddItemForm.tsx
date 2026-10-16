@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 
 interface Props {
   onAdd: (name: string, qty: string) => Promise<void>;
@@ -13,6 +13,38 @@ export const AddItemForm: React.FC<Props> = ({
 }) => {
   const [name, setName] = useState('');
   const [qty, setQty] = useState('');
+  const [showDropdown, setShowDropdown] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const dropdownRef = useRef<HTMLUListElement>(null);
+
+  // Фильтруем и ограничиваем до 5 элементов
+  const filteredItems = recentItems
+    .filter(item =>
+      item.toLowerCase().includes(name.toLowerCase())
+    )
+    .slice(0, 5);
+
+  // Закрываем dropdown при клике вне
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target as Node) &&
+        inputRef.current &&
+        !inputRef.current.contains(e.target as Node)
+      ) {
+        setShowDropdown(false);
+      }
+    };
+
+    if (showDropdown) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showDropdown]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,6 +52,13 @@ export const AddItemForm: React.FC<Props> = ({
     await onAdd(name, qty);
     setName('');
     setQty('');
+    setShowDropdown(false);
+  };
+
+  const handleSelect = async (item: string) => {
+    setName(item);
+    setShowDropdown(false);
+    inputRef.current?.focus();
   };
 
   const incrementQty = () => {
@@ -41,40 +80,71 @@ export const AddItemForm: React.FC<Props> = ({
     setQty(value);
   };
 
-  const handleFocus = () => onFocusChange?.(true);
-  const handleBlur = () => onFocusChange?.(false);
+  const handleFocus = () => {
+    onFocusChange?.(true);
+    setShowDropdown(true);
+  };
+
+  const handleBlur = () => {
+    onFocusChange?.(false);
+    // Не закрываем сразу — даём время на клик по dropdown
+    setTimeout(() => setShowDropdown(false), 150);
+  };
 
   return (
     <form className="add-form" onSubmit={handleSubmit}>
-      <div className="input-wrapper">
+      <div className="input-wrapper input-wrapper--dropdown">
         <input
+          ref={inputRef}
           type="text"
           placeholder="Название товара"
           value={name}
-          list="recent-items-list"
           onChange={e => setName(e.target.value)}
           onFocus={handleFocus}
           onBlur={handleBlur}
           className="input-name"
           autoFocus
           autoComplete="off"
+          autoCorrect="off"
+          autoCapitalize="off"
+          spellCheck={false}
         />
         <button type="submit" className="btn-add-circle" disabled={!name.trim()}>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
             <line x1="5" y1="12" x2="19" y2="12"></line>
             <line x1="12" y1="5" x2="12" y2="19"></line>
           </svg>
         </button>
+
+        {/* Кастомный dropdown */}
+        {showDropdown && filteredItems.length > 0 && (
+          <ul ref={dropdownRef} className="recent-dropdown">
+            {filteredItems.map(item => (
+              <li
+                key={item}
+                className="recent-dropdown-item"
+                onMouseDown={e => {
+                  e.preventDefault(); // Предотвращаем blur инпута
+                  handleSelect(item);
+                }}
+              >
+                {item}
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
 
-      {/* Показываем datalist только после начала ввода */}
-      {name.length > 0 && (
-        <datalist id="recent-items-list">
-          {recentItems.map((item: string) => (
-            <option key={item} value={item} />
-          ))}
-        </datalist>
-      )}
+      <div className="qty-label">Количество</div>
 
       <div className="qty-counter">
         <button
@@ -99,7 +169,7 @@ export const AddItemForm: React.FC<Props> = ({
           type="text"
           inputMode="numeric"
           pattern="[0-9]*"
-          placeholder="0"
+          placeholder="Кол-во"
           value={qty}
           onChange={handleQtyChange}
           onFocus={handleFocus}

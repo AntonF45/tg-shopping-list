@@ -271,6 +271,78 @@ input {
   box-shadow: 0 0 0 3px var(--accent-ring);
 }
 
+/* Dropdown позиционируется абсолютно внутри input-wrapper */
+.input-wrapper--dropdown {
+  position: relative;
+}
+
+.recent-dropdown {
+  position: absolute;
+  top: calc(100% + 4px); /* Строго под инпутом с отступом 4px */
+  left: 0;
+  right: 0;
+  z-index: 100;
+
+  max-height: calc(var(--tap) * 5 + var(--space-2) * 4); /* 5 элементов по 44px + отступы */
+  overflow-y: auto;
+
+  margin: 0;
+  padding: var(--space-1) 0;
+  list-style: none;
+
+  background: var(--surface);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-2);
+
+  animation: dropdown-in 0.15s ease;
+}
+
+.recent-dropdown::-webkit-scrollbar {
+  width: 4px;
+}
+
+.recent-dropdown::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 2px;
+}
+
+.recent-dropdown-item {
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--text-base);
+  color: var(--text);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.recent-dropdown-item:hover {
+  background: var(--surface-2);
+}
+
+.recent-dropdown-item:active {
+  background: var(--accent-ring);
+}
+
+@keyframes dropdown-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .recent-dropdown {
+    animation: none;
+  }
+}
+
 .input-name {
   flex: 1;
   min-width: 0;
