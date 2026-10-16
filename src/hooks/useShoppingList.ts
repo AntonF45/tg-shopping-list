@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { ShoppingList, AddItemInput } from '../types/shopping';
 import { localStorageRepository } from '../storage/localStorageRepository';
-import { logEvent, getInitialListLength } from '../lib/analytics';
+import { logEvent } from '../lib/analytics';
 import { triggerHaptic } from '../lib/telegram';
 
 export const useShoppingList = () => {

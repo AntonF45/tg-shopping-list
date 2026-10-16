@@ -5,6 +5,7 @@ export type AnalyticsEvent =
   | 'app_opened'
   | 'first_item_added'
   | 'item_added'
+  | 'item_duplicate_increased'
   | 'item_marked_done'
   | 'item_removed'
   | 'list_cleared'
