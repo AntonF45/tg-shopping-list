@@ -116,39 +116,57 @@ input {
 }
 
 /* ---------- 4. ЧИПСЫ + STICKY-ШАПКА (ОПТИМИЗИРОВАНО) ---------- */
+/* ==============================
+   ЧИПСЫ + STICKY-ШАПКА
+   ============================== */
+
 .list-chips-wrapper {
   position: sticky;
   top: 0;
   z-index: 40;
+
   padding-top: var(--safe-top, 0px);
-  
-  /* Эффект стекла */
-  background: color-mix(in srgb, var(--bg) 78%, transparent);
-  backdrop-filter: blur(14px) saturate(140%);
-  -webkit-backdrop-filter: blur(14px) saturate(140%);
-  border-bottom: 1px solid color-mix(in srgb, var(--border) 40%, transparent);
-  
+
+  /* Обычный полупрозрачный фон — базовый фолбэк */
+  background: var(--glass-bg, rgba(245, 243, 236, 0.82));
+
+  border-bottom: 1px solid var(--glass-border, rgba(26, 47, 35, 0.10));
+
   transition:
-    box-shadow 0.3s cubic-bezier(0.22, 1, 0.36, 1),
-    background-color 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    box-shadow 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Стекло включаем только если браузер поддерживает backdrop-filter */
+@supports (
+  (backdrop-filter: blur(1px)) or
+  (-webkit-backdrop-filter: blur(1px))
+) {
+  .list-chips-wrapper {
+    background: var(--glass-bg, rgba(245, 243, 236, 0.62));
+
+    backdrop-filter: blur(16px) saturate(150%);
+    -webkit-backdrop-filter: blur(16px) saturate(150%);
+  }
 }
 
 .list-chips-wrapper.is-scrolled {
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-}
-
-[data-theme='dark'] .list-chips-wrapper.is-scrolled {
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--shadow-1, 0 4px 20px rgba(0, 0, 0, 0.08));
+  border-bottom-color: var(--glass-border-strong, rgba(26, 47, 35, 0.16));
 }
 
 /* ==============================
-   СХЛОПЫВАНИЕ ЧИПСОВ (ПЛАВНОЕ)
+   СХЛОПЫВАНИЕ ЧИПСОВ
    ============================== */
 
 .chips-row {
   display: grid;
   grid-template-rows: 1fr;
-  transition: grid-template-rows 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+
+  transition:
+    grid-template-rows 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+
   overflow: hidden;
 }
 
@@ -158,27 +176,26 @@ input {
 
 .chips-row-inner {
   min-height: 0;
+
   display: flex;
   align-items: center;
   gap: 8px;
+
   padding: 6px 4px;
-  overflow-x: auto;
-  scrollbar-width: none;
-  -webkit-overflow-scrolling: touch;
-  
+
   opacity: 1;
   transform: translateY(0);
-  will-change: transform, opacity;
-  
+
   transition:
-    opacity 0.22s cubic-bezier(0.22, 1, 0.36, 1),
-    transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+    opacity 0.2s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .chips-row--collapsed .chips-row-inner {
   opacity: 0;
   transform: translateY(-4px);
-  /* УБРАНА задержка — исчезновение синхронно со схлопыванием */
+
+  pointer-events: none;
 }
 
 .chips-row-inner::-webkit-scrollbar {
@@ -186,14 +203,17 @@ input {
 }
 
 /* ==============================
-   ЗАГОЛОВОК (ЦЕНТРИРОВАННЫЙ + СТЕКЛО)
+   ЗАГОЛОВОК
    ============================== */
 
 .scrolled-header {
   display: grid;
   grid-template-rows: 0fr;
+
   overflow: hidden;
-  transition: grid-template-rows 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+
+  transition:
+    grid-template-rows 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .scrolled-header--visible {
@@ -202,61 +222,66 @@ input {
 
 .scrolled-header-inner {
   min-height: 0;
-  
-  /* Центрирование: flex + absolute счётчик */
+
   position: relative;
+
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--space-2, 8px);
-  padding: 12px 4px;
-  
+
+  padding: 12px 44px 12px 4px;
+
   opacity: 0;
   transform: translateY(4px);
-  will-change: transform, opacity;
-  
+
   transition:
-    opacity 0.24s cubic-bezier(0.22, 1, 0.36, 1),
-    transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+    opacity 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .scrolled-header--visible .scrolled-header-inner {
   opacity: 1;
   transform: translateY(0);
-  /* Небольшая задержка только на появление — создаёт эффект "передачи эстафеты" */
-  transition-delay: 0.04s;
+
+  /* Задержка только на появление */
+  transition-delay: 0.05s;
 }
 
 .scrolled-title {
   min-width: 0;
+
   font-size: 18px;
   font-weight: 700;
   letter-spacing: -0.02em;
+
   color: var(--text);
+
+  text-align: center;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  text-align: center;
 }
 
 .scrolled-count {
-  /* Абсолютное позиционирование справа, не влияет на центрирование заголовка */
   position: absolute;
   right: 4px;
   top: 50%;
   transform: translateY(-50%);
-  
+
   padding: 4px 10px;
+
   border-radius: var(--radius-pill);
+
   background: var(--accent);
   color: var(--accent-contrast);
+
   font-size: 12px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
 
 /* ==============================
-   СТИЛИ ЧИПСОВ
+   ЧИПСЫ
    ============================== */
 
 .chip-wrapper {
@@ -268,23 +293,30 @@ input {
   display: inline-flex;
   align-items: center;
   gap: 6px;
+
   min-height: 36px;
   padding: 6px 14px;
+
   border: 1.5px solid var(--border);
   border-radius: var(--radius-pill);
-  background: color-mix(in srgb, var(--surface) 85%, transparent);
+
+  background: var(--surface);
   color: var(--text-muted);
+
   font-size: 13px;
   font-weight: 600;
+
   white-space: nowrap;
+
   user-select: none;
   -webkit-user-select: none;
+
   transition:
-    background-color 0.2s ease,
-    border-color 0.2s ease,
-    color 0.2s ease,
+    background-color 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease,
     transform 0.18s ease,
-    box-shadow 0.2s ease;
+    box-shadow 0.18s ease;
 }
 
 .list-chip:active {
@@ -302,7 +334,9 @@ input {
 .chip-count {
   padding: 2px 6px;
   border-radius: 8px;
+
   background: color-mix(in srgb, currentColor 14%, transparent);
+
   font-size: 10px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
@@ -312,14 +346,19 @@ input {
   width: 36px;
   height: 36px;
   padding: 0;
+
   display: flex;
   align-items: center;
   justify-content: center;
+
   flex-shrink: 0;
+
   border: 1.5px dashed var(--border);
   border-radius: 50%;
+
   background: transparent;
   color: var(--text-muted);
+
   font-size: 18px;
   font-weight: 700;
 }
@@ -328,13 +367,33 @@ input {
   width: 110px;
   min-height: 36px;
   padding: 6px 12px;
+
   border: 1.5px solid var(--accent-strong);
   border-radius: var(--radius-pill);
+
   background: var(--surface);
   color: var(--text);
+
   font-size: 13px;
   font-weight: 600;
+
   outline: none;
+}
+
+/* ==============================
+   ТЕМЫ
+   ============================== */
+
+:root {
+  --glass-bg: rgba(245, 243, 236, 0.72);
+  --glass-border: rgba(26, 47, 35, 0.10);
+  --glass-border-strong: rgba(26, 47, 35, 0.16);
+}
+
+[data-theme='dark'] {
+  --glass-bg: rgba(20, 38, 29, 0.68);
+  --glass-border: rgba(245, 243, 236, 0.10);
+  --glass-border-strong: rgba(245, 243, 236, 0.16);
 }
 
 /* ==============================
