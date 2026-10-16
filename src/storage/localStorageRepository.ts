@@ -1,5 +1,14 @@
-import { ShoppingList, ShoppingItem, AddItemInput, AddItemResult } from '../types/shopping';
-import { ShoppingListRepository, ListStorage } from './types';
+import {
+  ShoppingList,
+  ShoppingItem,
+  AddItemInput,
+  AddItemResult,
+} from '../types/shopping';
+import {
+  ShoppingListRepository,
+  ListStorage,
+  ShoppingListsStore,
+} from './types';
 
 const STORAGE_KEY = 'shopping_lists_v2';
 const RECENT_KEY = 'recent_items_v1';
@@ -22,12 +31,6 @@ const createEmptyStore = (): ShoppingListsStore => {
   };
 };
 
-interface ShoppingListsStore {
-  version: number;
-  activeListId: string;
-  lists: ShoppingList[];
-}
-
 const storageAdapter: ListStorage = {
   async getList(): Promise<ShoppingList> {
     try {
@@ -35,7 +38,10 @@ const storageAdapter: ListStorage = {
       if (!raw) return createEmptyList();
       const parsed: ShoppingListsStore = JSON.parse(raw);
       if (parsed.version === SCHEMA_VERSION && parsed.lists?.length > 0) {
-        return parsed.lists.find(l => l.id === parsed.activeListId) || parsed.lists[0];
+        return (
+          parsed.lists.find((l: ShoppingList) => l.id === parsed.activeListId) ||
+          parsed.lists[0]
+        );
       }
       return createEmptyList();
     } catch {
@@ -46,8 +52,10 @@ const storageAdapter: ListStorage = {
   async saveList(list: ShoppingList): Promise<void> {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      const store: ShoppingListsStore = raw ? JSON.parse(raw) : createEmptyStore();
-      const idx = store.lists.findIndex(l => l.id === list.id);
+      const store: ShoppingListsStore = raw
+        ? JSON.parse(raw)
+        : createEmptyStore();
+      const idx = store.lists.findIndex((l: ShoppingList) => l.id === list.id);
       if (idx >= 0) store.lists[idx] = list;
       localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
     } catch (error) {
@@ -57,7 +65,7 @@ const storageAdapter: ListStorage = {
 
   async clear(): Promise<void> {
     localStorage.removeItem(STORAGE_KEY);
-  }
+  },
 };
 
 // === Recent items helpers ===
@@ -75,7 +83,7 @@ const saveRecentToStorage = (items: string[]): void => {
 };
 
 export const localStorageRepository: ShoppingListRepository = {
-  async getList() {
+  async getList(): Promise<ShoppingList> {
     return storageAdapter.getList();
   },
 
@@ -87,8 +95,9 @@ export const localStorageRepository: ShoppingListRepository = {
     const trimmed = name.trim();
     if (!trimmed) return;
     const items = getRecentFromStorage();
-    // Удаляем дубли (case-insensitive)
-    const filtered = items.filter(i => i.toLowerCase() !== trimmed.toLowerCase());
+    const filtered = items.filter(
+      (i: string) => i.toLowerCase() !== trimmed.toLowerCase()
+    );
     filtered.unshift(trimmed);
     saveRecentToStorage(filtered.slice(0, MAX_RECENT));
   },
@@ -98,13 +107,11 @@ export const localStorageRepository: ShoppingListRepository = {
     const now = Math.floor(Date.now() / 1000);
     const normalizedName = input.name.toLowerCase().trim();
 
-    // Проверка дубликата
     const existing = list.items.find(
-      i => i.name.toLowerCase().trim() === normalizedName
+      (i: ShoppingItem) => i.name.toLowerCase().trim() === normalizedName
     );
 
     if (existing) {
-      // Увеличиваем количество
       const currentQty = parseInt(existing.qty || '0') || 0;
       existing.qty = (currentQty + 1).toString();
       existing.updatedAt = now;
@@ -113,7 +120,6 @@ export const localStorageRepository: ShoppingListRepository = {
       return { item: existing, wasDuplicate: true };
     }
 
-    // Новый товар
     const newItem: ShoppingItem = {
       id: crypto.randomUUID(),
       name: input.name.trim(),
@@ -132,7 +138,7 @@ export const localStorageRepository: ShoppingListRepository = {
 
   async toggleItem(id: string): Promise<ShoppingItem> {
     const list = await storageAdapter.getList();
-    const item = list.items.find(i => i.id === id);
+    const item = list.items.find((i: ShoppingItem) => i.id === id);
     if (!item) throw new Error('Item not found');
     item.isDone = !item.isDone;
     item.updatedAt = Math.floor(Date.now() / 1000);
@@ -143,21 +149,21 @@ export const localStorageRepository: ShoppingListRepository = {
 
   async removeItem(id: string): Promise<void> {
     const list = await storageAdapter.getList();
-    list.items = list.items.filter(i => i.id !== id);
+    list.items = list.items.filter((i: ShoppingItem) => i.id !== id);
     list.updatedAt = Math.floor(Date.now() / 1000);
     await storageAdapter.saveList(list);
   },
 
   async clearDone(): Promise<void> {
     const list = await storageAdapter.getList();
-    list.items = list.items.filter(i => !i.isDone);
+    list.items = list.items.filter((i: ShoppingItem) => !i.isDone);
     list.updatedAt = Math.floor(Date.now() / 1000);
     await storageAdapter.saveList(list);
   },
 
   async updateQty(id: string, qty: string): Promise<ShoppingItem> {
     const list = await storageAdapter.getList();
-    const item = list.items.find(i => i.id === id);
+    const item = list.items.find((i: ShoppingItem) => i.id === id);
     if (!item) throw new Error('Item not found');
     item.qty = qty;
     item.updatedAt = Math.floor(Date.now() / 1000);
@@ -182,7 +188,11 @@ export const localStorageRepository: ShoppingListRepository = {
 
   async getActiveList(): Promise<ShoppingList> {
     const store = await this.getAllLists();
-    return store.lists.find(l => l.id === store.activeListId) || store.lists[0] || createEmptyList();
+    return (
+      store.lists.find((l: ShoppingList) => l.id === store.activeListId) ||
+      store.lists[0] ||
+      createEmptyList()
+    );
   },
 
   async setActiveList(id: string): Promise<void> {
@@ -202,19 +212,20 @@ export const localStorageRepository: ShoppingListRepository = {
 
   async deleteList(id: string): Promise<void> {
     const store = await this.getAllLists();
-    if (store.lists.length <= 1) throw new Error('Нельзя удалить последний список');
-    store.lists = store.lists.filter(l => l.id !== id);
+    if (store.lists.length <= 1)
+      throw new Error('Нельзя удалить последний список');
+    store.lists = store.lists.filter((l: ShoppingList) => l.id !== id);
     if (store.activeListId === id) store.activeListId = store.lists[0].id;
     localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
   },
 
   async renameList(id: string, newTitle: string): Promise<void> {
     const store = await this.getAllLists();
-    const list = store.lists.find(l => l.id === id);
+    const list = store.lists.find((l: ShoppingList) => l.id === id);
     if (list) {
       list.title = newTitle;
       list.updatedAt = Math.floor(Date.now() / 1000);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
     }
-  }
+  },
 };
