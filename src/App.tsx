@@ -5,7 +5,6 @@ import { ItemList } from './components/ItemList';
 import { ShareButton } from './components/ShareButton';
 import { ListChips } from './components/ListChips';
 import { Toast } from './components/Toast';
-import { ProgressFieldset } from './components/ProgressFieldset';
 
 const App: React.FC = () => {
   const {
@@ -88,15 +87,11 @@ const App: React.FC = () => {
           recentItems={recentItems}
         />
 
-        {/* Блок чек-листа с встроенным label "X из Y" */}
-        <div className="item-list">
-          <ProgressFieldset items={list.items} />
-          <ItemList
-            items={list.items}
-            onToggle={toggleItem}
-            onRemove={removeItem}
-          />
-        </div>
+        <ItemList
+          items={list.items}
+          onToggle={toggleItem}
+          onRemove={removeItem}
+        />
       </main>
 
       <ShareButton
