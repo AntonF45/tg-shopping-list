@@ -37,9 +37,9 @@ export const ListChips: React.FC<Props> = ({
   const chipsRowRef = useRef<HTMLDivElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
-  // Передаём ref на контейнер чипсов — хук будет слушать его скролл
+  // Хук слушает скролл внутри этого wrapper'а
   const { isScrolled } = useScrollProgress({
-    threshold: 80,
+    threshold: 60, // Оптимальный порог для начала анимации
     containerRef: wrapperRef,
   });
 
@@ -84,10 +84,7 @@ export const ListChips: React.FC<Props> = ({
     const half = rect.width / 2;
     const vw = window.innerWidth;
 
-    const clampedCenter = Math.min(
-      Math.max(menu.anchorX, half + margin),
-      vw - half - margin
-    );
+    const clampedCenter = Math.min(Math.max(menu.anchorX, half + margin), vw - half - margin);
     const left = clampedCenter - half;
     const arrowLeft = half + (menu.anchorX - clampedCenter);
 
@@ -183,63 +180,64 @@ export const ListChips: React.FC<Props> = ({
       className={`list-chips-wrapper ${isScrolled ? 'is-scrolled' : ''}`}
       ref={wrapperRef}
     >
-      {/* Ряд чипсов: сворачивается при скролле */}
+      {/* Сворачивающийся ряд чипсов */}
       <div className={`chips-row ${isScrolled ? 'chips-row--collapsed' : ''}`} ref={chipsRowRef}>
-  <div className="chips-row-inner">
-    {lists.map((list) => (
-      <div key={list.id} className="chip-wrapper">
-        {editingId === list.id ? (
-          <input
-            type="text"
-            className="chip-input"
-            value={editTitle}
-            onChange={(e) => setEditTitle(e.target.value)}
-            onBlur={() => handleRename(list.id)}
-            onKeyDown={(e) => handleKeyDown(e, 'rename', list.id)}
-            autoFocus
-          />
-        ) : (
-          <ChipButton
-            list={list}
-            isActive={list.id === activeListId}
-            onSelect={() => handleChipClick(list.id)}
-            onLongPress={openMenu}
-          />
-        )}
+        <div className="chips-row-inner">
+          {lists.map((list) => (
+            <div key={list.id} className="chip-wrapper">
+              {editingId === list.id ? (
+                <input
+                  type="text"
+                  className="chip-input"
+                  value={editTitle}
+                  onChange={(e) => setEditTitle(e.target.value)}
+                  onBlur={() => handleRename(list.id)}
+                  onKeyDown={(e) => handleKeyDown(e, 'rename', list.id)}
+                  autoFocus
+                />
+              ) : (
+                <ChipButton
+                  list={list}
+                  isActive={list.id === activeListId}
+                  onSelect={() => handleChipClick(list.id)}
+                  onLongPress={openMenu}
+                />
+              )}
+            </div>
+          ))}
+
+          {isCreating ? (
+            <input
+              type="text"
+              className="chip-input"
+              placeholder="Название"
+              value={newTitle}
+              onChange={(e) => setNewTitle(e.target.value)}
+              onBlur={handleCreate}
+              onKeyDown={(e) => handleKeyDown(e, 'create')}
+              autoFocus
+            />
+          ) : (
+            <button
+              type="button"
+              className="list-chip list-chip-add"
+              aria-label="Добавить список"
+              onClick={() => {
+                setIsCreating(true);
+                triggerHaptic('light');
+              }}
+            >
+              +
+            </button>
+          )}
+        </div>
       </div>
-    ))}
 
-    {isCreating ? (
-      <input
-        type="text"
-        className="chip-input"
-        placeholder="Название"
-        value={newTitle}
-        onChange={(e) => setNewTitle(e.target.value)}
-        onBlur={handleCreate}
-        onKeyDown={(e) => handleKeyDown(e, 'create')}
-        autoFocus
-      />
-    ) : (
-      <button
-        className="list-chip list-chip-add"
-        onClick={() => {
-          setIsCreating(true);
-          triggerHaptic('light');
-        }}
-        type="button"
-        aria-label="Добавить список"
-      >
-        +
-      </button>
-    )}
-  </div>
-</div>
-
-      {/* Заголовок: появляется при скролле */}
+      {/* Появляющийся заголовок */}
       {activeList && (
         <div
           className={`scrolled-header ${isScrolled ? 'scrolled-header--visible' : ''}`}
+          aria-hidden={!isScrolled}
         >
           <div className="scrolled-header-inner">
             <span className="scrolled-title">{activeList.title}</span>
@@ -298,6 +296,7 @@ export const ListChips: React.FC<Props> = ({
     </div>
   );
 };
+
 
 interface ChipButtonProps {
   list: ShoppingList;

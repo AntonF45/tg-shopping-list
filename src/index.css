@@ -120,25 +120,26 @@ input {
   position: sticky;
   top: 0;
   z-index: 40;
+  padding-top: var(--safe-top, 0px);
   background: var(--bg);
-  transition: box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  padding-top: var(--safe-top); /* Учет челки iPhone */
+  transition:
+    box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+    background-color 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .list-chips-wrapper.is-scrolled {
   box-shadow: var(--shadow-1);
 }
 
-/* Анимация схлопывания чипсов */
+/* ==============================
+   Схлопывание чипсов
+   ============================== */
+
 .chips-row {
   display: grid;
   grid-template-rows: 1fr;
-  transition: grid-template-rows 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: grid-template-rows 0.28s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
-}
-
-.chips-row > * {
-  min-height: 0;
 }
 
 .chips-row--collapsed {
@@ -146,48 +147,95 @@ input {
 }
 
 .chips-row-inner {
+  min-height: 0; /* КРИТИЧЕСКИ ВАЖНО для grid 0fr */
   display: flex;
-  gap: 8px;
   align-items: center;
-  padding: 6px 4px; /* Уменьшенный паддинг для компактности */
+  gap: 8px;
+  padding: 6px 4px;
   overflow-x: auto;
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
-  /* Добавляем плавное исчезновение и сдвиг вверх */
-  transition: opacity 0.2s ease, transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  opacity: 1;
+  transform: translateY(0);
+  transition:
+    opacity 0.18s ease,
+    transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .chips-row--collapsed .chips-row-inner {
   opacity: 0;
-  transform: translateY(-8px); /* Чипсы "улетают" вверх при схлопывании */
+  transform: translateY(-6px);
+  /* Задержка только на исчезновение: сначала схлопывается высота, потом растворяется контент */
+  transition-delay: 0.04s;
 }
 
 .chips-row-inner::-webkit-scrollbar {
   display: none;
 }
 
+/* ==============================
+   Появление заголовка
+   ============================== */
+
+.scrolled-header {
+  display: grid;
+  grid-template-rows: 0fr;
+  overflow: hidden;
+  transition: grid-template-rows 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.scrolled-header--visible {
+  grid-template-rows: 1fr;
+}
+
+.scrolled-header-inner {
+  min-height: 0; /* КРИТИЧЕСКИ ВАЖНО для grid 0fr */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2, 8px);
+  padding: 10px 4px;
+  
+  opacity: 0;
+  transform: translateY(6px);
+  transition:
+    opacity 0.22s ease,
+    transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.scrolled-header--visible .scrolled-header-inner {
+  opacity: 1;
+  transform: translateY(0);
+  /* Заголовок появляется чуть позже, создавая эффект "передачи эстафеты" */
+  transition-delay: 0.06s;
+}
+
+/* ==============================
+   Стили самих чипсов
+   ============================== */
+
 .chip-wrapper {
   position: relative;
   flex-shrink: 0;
 }
 
-/* Компактные стили чипсов */
 .list-chip {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  min-height: 36px; /* Было 40px, стало компактнее */
+  min-height: 36px;
   padding: 6px 14px;
   border: 1.5px solid var(--border);
   border-radius: var(--radius-pill);
   background: var(--surface);
   color: var(--text-muted);
-  font-size: 13px; /* Чуть меньше шрифт */
+  font-size: 13px;
   font-weight: 600;
   white-space: nowrap;
   user-select: none;
   -webkit-user-select: none;
-  transition: all 0.2s ease;
+  transition: background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
 }
 
 .list-chip:active {
@@ -205,33 +253,26 @@ input {
 .chip-count {
   padding: 2px 6px;
   border-radius: 8px;
-  background: rgba(0, 0, 0, 0.1);
+  background: color-mix(in srgb, currentColor 14%, transparent);
   font-size: 10px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
 
-.list-chip.active .chip-count {
-  background: rgba(255, 255, 255, 0.25);
-}
-
-[data-theme="dark"] .list-chip.active .chip-count {
-  background: rgba(0, 0, 0, 0.2);
-}
-
 .list-chip-add {
-  width: 36px; /* Компактная кнопка */
+  width: 36px;
   height: 36px;
   padding: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
-  font-weight: 700;
-  border-radius: 50%;
   flex-shrink: 0;
   border: 1.5px dashed var(--border);
+  border-radius: 50%;
+  background: transparent;
   color: var(--text-muted);
+  font-size: 18px;
+  font-weight: 700;
 }
 
 .chip-input {
@@ -247,40 +288,13 @@ input {
   outline: none;
 }
 
-/* Анимация появления заголовка (бесшовная передача эстафеты) */
-.scrolled-header {
-  display: grid;
-  grid-template-rows: 0fr;
-  transition: grid-template-rows 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  overflow: hidden;
-}
-
-.scrolled-header--visible {
-  grid-template-rows: 1fr;
-}
-
-.scrolled-header-inner {
-  min-height: 0;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-2);
-  padding: 10px 4px; /* Компактный заголовок */
-  opacity: 0;
-  transform: translateY(8px); /* Начинает появляться снизу */
-  transition: opacity 0.25s ease, transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.scrolled-header--visible .scrolled-header-inner {
-  opacity: 1;
-  transform: translateY(0);
-  /* Небольшая задержка, чтобы чипсы начали схлопываться ПЕРЕД появлением заголовка */
-  transition-delay: 0.05s; 
-}
+/* ==============================
+   Стили заголовка
+   ============================== */
 
 .scrolled-title {
   min-width: 0;
-  font-size: 18px; /* Оптимальный размер для заголовка */
+  font-size: 18px;
   font-weight: 700;
   letter-spacing: -0.02em;
   color: var(--text);
@@ -298,6 +312,20 @@ input {
   font-size: 12px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
+}
+
+/* ==============================
+   Доступность
+   ============================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .chips-row,
+  .chips-row-inner,
+  .scrolled-header,
+  .scrolled-header-inner,
+  .list-chips-wrapper {
+    transition: none !important;
+  }
 }
 
 /* ---------- 5. ФОРМА ДОБАВЛЕНИЯ ---------- */
