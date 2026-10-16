@@ -147,47 +147,6 @@ input {
   display: contents; /* Прозрачная обёртка */
 }
 
-/* Заголовок при скролле — простой, без анимации */
-.scrolled-header {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  padding: 12px 4px;
-  background: var(--bg);
-  border-bottom: 1px solid var(--border);
-}
-
-.scrolled-header-inner {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  width: 100%;
-}
-
-.scrolled-title {
-  font-size: 18px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  color: var(--text);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  text-align: center;
-}
-
-.scrolled-count {
-  flex-shrink: 0;
-  padding: 4px 10px;
-  border-radius: var(--radius-pill);
-  background: var(--accent);
-  color: var(--accent-contrast);
-  font-size: 12px;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-}
-
 /* ==============================
    СТИЛИ ЧИПСОВ (БЕЗ ФОНА)
    ============================== */

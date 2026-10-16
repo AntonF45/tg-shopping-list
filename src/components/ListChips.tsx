@@ -167,8 +167,6 @@ export const ListChips: React.FC<Props> = ({
     triggerHaptic('medium');
   }, []);
 
-  const activeList = lists.find((l) => l.id === activeListId);
-
   return (
     <div className="list-chips-wrapper">
       {/* Ряд чипсов с горизонтальным скроллом */}
@@ -217,20 +215,22 @@ export const ListChips: React.FC<Props> = ({
               triggerHaptic('light');
             }}
           >
-            +
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
           </button>
         )}
       </div>
-
-      {/* Заголовок при скролле — простой, без анимации */}
-      {activeList && (
-        <div className="scrolled-header">
-          <div className="scrolled-header-inner">
-            <span className="scrolled-title">{activeList.title}</span>
-            <span className="scrolled-count">{activeList.items.length}</span>
-          </div>
-        </div>
-      )}
 
       {/* Меню чипса */}
       {menu && (
