@@ -335,6 +335,15 @@ const ChipButton: React.FC<ChipButtonProps> = ({ list, isActive, onSelect, onLon
 
     if (!isLongPressRef.current) {
       onSelect();
+      
+      // Прокручиваем чипс в видимую область
+      if (buttonRef.current) {
+        buttonRef.current.scrollIntoView({
+          behavior: 'smooth',
+          block: 'nearest',
+          inline: 'center',
+        });
+      }
     }
 
     isLongPressRef.current = false;
