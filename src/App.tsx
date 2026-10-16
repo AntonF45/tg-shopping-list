@@ -80,19 +80,14 @@ const App: React.FC = () => {
         onDelete={deleteList}
       />
 
-      <main className="app-main">
-        <AddItemForm
-          onAdd={handleAdd}
-          onFocusChange={handleFocusChange}
-          recentItems={recentItems}
-        />
+      <div className="item-list">
         <ProgressFieldset items={list.items} />
         <ItemList
           items={list.items}
           onToggle={toggleItem}
           onRemove={removeItem}
         />
-      </main>
+      </div>
 
       <ShareButton
         items={list.items}

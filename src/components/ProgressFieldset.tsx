@@ -14,12 +14,10 @@ export const ProgressFieldset: React.FC<Props> = ({ items }) => {
   const allDone = done === total;
 
   return (
-    <div className="progress-box">
-      <label className="progress-label">
-        <span className={`progress-text ${allDone ? 'progress-text--done' : ''}`}>
-          {done} из {total}
-        </span>
-      </label>
-    </div>
+    <label className="progress-label">
+      <span className={`progress-text ${allDone ? 'progress-text--done' : ''}`}>
+        {done} из {total}
+      </span>
+    </label>
   );
 };

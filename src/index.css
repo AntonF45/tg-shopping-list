@@ -419,23 +419,26 @@ input {
   }
 }
 
-/* === БЛОК ПРОГРЕССА "X из Y" (label с вырезом в рамке) === */
-.progress-box {
-  position: relative;
-  border: 2px solid var(--border);
-  border-radius: var(--radius-md);
+/* === LABEL "X из Y" встроен в верхнюю рамку чек-листа === */
+.item-list {
+  position: relative; /* Чтобы label позиционировался относительно этого блока */
+  display: flex;
+  flex-direction: column;
+  padding: 4px var(--space-3);
   background: var(--surface);
-  min-height: 16px;
-  margin-bottom: var(--space-3);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-1);
 }
 
 .progress-label {
   position: absolute;
-  top: -9px;
-  left: 14px;
+  top: -10px; /* Поднимаем label на границу */
+  left: 16px;
   padding: 0 6px;
-  background: var(--surface); /* Перекрывает рамку — создаёт "вырез" */
+  background: var(--bg); /* Фон страницы — "вырезает" верхнюю рамку */
   line-height: 1;
+  z-index: 1;
 }
 
 .progress-text {
@@ -449,11 +452,6 @@ input {
 
 .progress-text--done {
   color: var(--accent-strong);
-}
-
-/* Адаптация под тёмную тему */
-[data-theme='dark'] .progress-box {
-  background: var(--surface);
 }
 
 /* ---------- 6. ЧЕК-ЛИСТ ---------- */
