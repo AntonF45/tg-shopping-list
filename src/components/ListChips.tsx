@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useLayoutEffect, useRef, useCallback } from 'react';
 import { ShoppingList } from '../types/shopping';
 import { triggerHaptic } from '../lib/telegram';
-import { useScrollProgress } from '../hooks/useScrollProgress';
 
 interface Props {
   lists: ShoppingList[];
@@ -35,19 +34,13 @@ export const ListChips: React.FC<Props> = ({
 
   const menuRef = useRef<HTMLDivElement>(null);
   const chipsRowRef = useRef<HTMLDivElement>(null);
-  const wrapperRef = useRef<HTMLDivElement>(null);
-
-  // Хук слушает скролл внутри этого wrapper'а
-  const { isScrolled } = useScrollProgress({
-    threshold: 60, // Оптимальный порог для начала анимации
-    containerRef: wrapperRef,
-  });
 
   const closeMenu = useCallback(() => {
     setMenu(null);
     setMenuBox(null);
   }, []);
 
+  // Закрытие меню по клику вне и по скроллу
   useEffect(() => {
     if (!menu) return;
 
@@ -64,6 +57,7 @@ export const ListChips: React.FC<Props> = ({
     window.addEventListener('resize', onScroll);
     window.addEventListener('scroll', onScroll, { passive: true });
 
+    // Закрытие меню при горизонтальном скролле чипсов
     if (chipsRowRef.current) {
       chipsRowRef.current.addEventListener('scroll', onScroll, { passive: true });
     }
@@ -176,69 +170,61 @@ export const ListChips: React.FC<Props> = ({
   const activeList = lists.find((l) => l.id === activeListId);
 
   return (
-    <div
-      className={`list-chips-wrapper ${isScrolled ? 'is-scrolled' : ''}`}
-      ref={wrapperRef}
-    >
-      {/* Сворачивающийся ряд чипсов */}
-      <div className={`chips-row ${isScrolled ? 'chips-row--collapsed' : ''}`} ref={chipsRowRef}>
-        <div className="chips-row-inner">
-          {lists.map((list) => (
-            <div key={list.id} className="chip-wrapper">
-              {editingId === list.id ? (
-                <input
-                  type="text"
-                  className="chip-input"
-                  value={editTitle}
-                  onChange={(e) => setEditTitle(e.target.value)}
-                  onBlur={() => handleRename(list.id)}
-                  onKeyDown={(e) => handleKeyDown(e, 'rename', list.id)}
-                  autoFocus
-                />
-              ) : (
-                <ChipButton
-                  list={list}
-                  isActive={list.id === activeListId}
-                  onSelect={() => handleChipClick(list.id)}
-                  onLongPress={openMenu}
-                />
-              )}
-            </div>
-          ))}
+    <div className="list-chips-wrapper">
+      {/* Ряд чипсов с горизонтальным скроллом */}
+      <div className="chips-row" ref={chipsRowRef}>
+        {lists.map((list) => (
+          <div key={list.id} className="chip-wrapper">
+            {editingId === list.id ? (
+              <input
+                type="text"
+                className="chip-input"
+                value={editTitle}
+                onChange={(e) => setEditTitle(e.target.value)}
+                onBlur={() => handleRename(list.id)}
+                onKeyDown={(e) => handleKeyDown(e, 'rename', list.id)}
+                autoFocus
+              />
+            ) : (
+              <ChipButton
+                list={list}
+                isActive={list.id === activeListId}
+                onSelect={() => handleChipClick(list.id)}
+                onLongPress={openMenu}
+              />
+            )}
+          </div>
+        ))}
 
-          {isCreating ? (
-            <input
-              type="text"
-              className="chip-input"
-              placeholder="Название"
-              value={newTitle}
-              onChange={(e) => setNewTitle(e.target.value)}
-              onBlur={handleCreate}
-              onKeyDown={(e) => handleKeyDown(e, 'create')}
-              autoFocus
-            />
-          ) : (
-            <button
-              type="button"
-              className="list-chip list-chip-add"
-              aria-label="Добавить список"
-              onClick={() => {
-                setIsCreating(true);
-                triggerHaptic('light');
-              }}
-            >
-              +
-            </button>
-          )}
-        </div>
+        {isCreating ? (
+          <input
+            type="text"
+            className="chip-input"
+            placeholder="Название"
+            value={newTitle}
+            onChange={(e) => setNewTitle(e.target.value)}
+            onBlur={handleCreate}
+            onKeyDown={(e) => handleKeyDown(e, 'create')}
+            autoFocus
+          />
+        ) : (
+          <button
+            type="button"
+            className="list-chip list-chip-add"
+            aria-label="Добавить список"
+            onClick={() => {
+              setIsCreating(true);
+              triggerHaptic('light');
+            }}
+          >
+            +
+          </button>
+        )}
       </div>
 
-      {/* Появляющийся заголовок */}
+      {/* Заголовок при скролле — простой, без анимации */}
       {activeList && (
-        <div
-          className={`scrolled-header ${isScrolled ? 'scrolled-header--visible' : ''}`}
-          aria-hidden={!isScrolled}
-        >
+        <div className="scrolled-header">
           <div className="scrolled-header-inner">
             <span className="scrolled-title">{activeList.title}</span>
             <span className="scrolled-count">{activeList.items.length}</span>
@@ -297,7 +283,7 @@ export const ListChips: React.FC<Props> = ({
   );
 };
 
-
+// ChipButton с логикой long press
 interface ChipButtonProps {
   list: ShoppingList;
   isActive: boolean;
@@ -305,12 +291,7 @@ interface ChipButtonProps {
   onLongPress: (listId: string, anchor: DOMRect) => void;
 }
 
-const ChipButton: React.FC<ChipButtonProps> = ({
-  list,
-  isActive,
-  onSelect,
-  onLongPress,
-}) => {
+const ChipButton: React.FC<ChipButtonProps> = ({ list, isActive, onSelect, onLongPress }) => {
   const buttonRef = useRef<HTMLButtonElement>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isLongPressRef = useRef(false);
