@@ -5,96 +5,238 @@ interface ShareOptions {
   includeDone?: boolean;
 }
 
+const pluralize = (
+  count: number,
+  forms: [string, string, string]
+): string => {
+  const mod10 = count % 10;
+  const mod100 = count % 100;
+
+  if (mod10 === 1 && mod100 !== 11) {
+    return forms[0];
+  }
+
+  if (
+    mod10 >= 2 &&
+    mod10 <= 4 &&
+    (mod100 < 10 || mod100 >= 20)
+  ) {
+    return forms[1];
+  }
+
+  return forms[2];
+};
+
+const formatQuantity = (
+  qty: ShoppingItem['qty']
+): string => {
+  const value = Number(qty);
+
+  if (!qty || Number.isNaN(value) || value <= 1) {
+    return '';
+  }
+
+  return ` — ${qty} шт.`;
+};
+
+const formatDate = (date: Date): string => {
+  return new Intl.DateTimeFormat('ru-RU', {
+    day: 'numeric',
+    month: 'long',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(date);
+};
+
+const buildListText = (
+  items: ShoppingItem[],
+  listTitle: string,
+  includeDone: boolean
+): string => {
+  const activeItems = items.filter(item => !item.isDone);
+  const doneItems = items.filter(item => item.isDone);
+
+  const itemsToShare = includeDone ? items : activeItems;
+
+  if (itemsToShare.length === 0) {
+    return `🛒 ${listTitle}\n\nСписок пуст.`;
+  }
+
+  const lines: string[] = [];
+
+  lines.push(`🛒 ${listTitle}`);
+  lines.push(`📅 ${formatDate(new Date())}`);
+  lines.push('');
+
+  if (activeItems.length > 0) {
+    lines.push('Нужно купить:');
+
+    activeItems.forEach(item => {
+      const quantity = formatQuantity(item.qty);
+
+      lines.push(`▫️ ${item.name}${quantity}`);
+    });
+
+    lines.push('');
+  }
+
+  if (includeDone && doneItems.length > 0) {
+    lines.push('Уже куплено:');
+
+    doneItems.forEach(item => {
+      const quantity = formatQuantity(item.qty);
+
+      lines.push(`✅ ${item.name}${quantity}`);
+    });
+
+    lines.push('');
+  }
+
+  const total = itemsToShare.length;
+
+  const totalWord = pluralize(total, [
+    'позиция',
+    'позиции',
+    'позиций',
+  ]);
+
+  lines.push('— — — — — — — — — —');
+  lines.push(`📦 Всего: ${total} ${totalWord}`);
+
+  if (includeDone && doneItems.length > 0) {
+    const doneWord = pluralize(doneItems.length, [
+      'куплена',
+      'куплено',
+      'куплено',
+    ]);
+
+    lines.push(`✅ ${doneItems.length} ${doneWord}`);
+  }
+
+  lines.push('');
+  lines.push('Создано в Mossforge');
+
+  return lines.join('\n');
+};
+
 export const shareList = async (
   items: ShoppingItem[],
   options: ShareOptions = {}
 ) => {
-  const { listTitle = 'Покупки', includeDone = true } = options;
+  const {
+    listTitle = 'Покупки',
+    includeDone = true,
+  } = options;
 
   const itemsToShare = includeDone
     ? items
-    : items.filter(i => !i.isDone);
+    : items.filter(item => !item.isDone);
+
+  const tg = window.Telegram?.WebApp;
 
   if (itemsToShare.length === 0) {
-    const tg = window.Telegram?.WebApp;
+    const message = 'Список пуст';
+
     if (tg?.showAlert) {
-      tg.showAlert('Список пуст');
+      tg.showAlert(message);
     } else {
-      alert('Список пуст');
+      alert(message);
     }
+
     return;
   }
 
-  // Формируем текст сообщения
-  const lines: string[] = [];
-  lines.push(`🛒 Список покупок: ${listTitle}`);
-  lines.push('');
+  const text = buildListText(
+    items,
+    listTitle,
+    includeDone
+  );
 
-  itemsToShare.forEach(item => {
-    const qty = item.qty ? ` × ${item.qty}` : '';
-    const doneMark = item.isDone ? ' ✓' : '';
-    lines.push(`— ${item.name}${qty}${doneMark}`);
-  });
-
-  const doneCount = items.filter(i => i.isDone).length;
-  const totalCount = items.length;
-
-  lines.push('');
-  lines.push(`━━━━━━━━━━━━━━━━━━━━`);
-  lines.push(`Итого: ${totalCount} позиций${doneCount > 0 ? `, ${doneCount} куплено` : ''}`);
-
-  const text = lines.join('\n');
-
-  // Способ 1: Нативный share API (мобильные устройства)
+  // 1. Нативное меню «Поделиться»
   if (navigator.share) {
     try {
       await navigator.share({
-        title: `Список покупок: ${listTitle}`,
-        text: text,
+        title: listTitle,
+        text,
       });
+
       return;
-    } catch (err) {
-      // Пользователь отменил share или ошибка — продолжаем к fallback
-      if ((err as Error).name === 'AbortError') {
-        return; // Пользователь отменил — ничего не делаем
+    } catch (error) {
+      if ((error as Error).name === 'AbortError') {
+        return;
       }
-      console.warn('navigator.share failed:', err);
+
+      console.warn('navigator.share failed:', error);
     }
   }
 
-  // Способ 2: Telegram WebApp openTelegramLink (десктоп)
-  const tg = window.Telegram?.WebApp;
+  // 2. Шаринг через Telegram
   if (tg?.openTelegramLink) {
     try {
-      // Открываем диалог share с предзаполненным текстом
       const encodedText = encodeURIComponent(text);
-      tg.openTelegramLink(`https://t.me/share/url?url=&text=${encodedText}`);
+
+      tg.openTelegramLink(
+        `https://t.me/share/url?url=&text=${encodedText}`
+      );
+
       return;
-    } catch (err) {
-      console.warn('openTelegramLink failed:', err);
+    } catch (error) {
+      console.warn('openTelegramLink failed:', error);
     }
   }
 
-  // Способ 3: Копирование в буфер обмена
+  // 3. Копирование в буфер обмена
   try {
     await navigator.clipboard.writeText(text);
+
+    const message = 'Список скопирован в буфер обмена';
+
     if (tg?.showAlert) {
-      tg.showAlert('Список скопирован в буфер обмена');
+      tg.showAlert(message);
     } else {
-      alert('Список скопирован в буфер обмена');
+      alert(message);
     }
-  } catch {
-    // Последний fallback
+
+    return;
+  } catch (error) {
+    console.warn('clipboard.writeText failed:', error);
+  }
+
+  // 4. Резервное копирование
+  try {
     const textarea = document.createElement('textarea');
+
     textarea.value = text;
+    textarea.style.position = 'fixed';
+    textarea.style.opacity = '0';
+
     document.body.appendChild(textarea);
     textarea.select();
-    try {
-      document.execCommand('copy');
-      alert('Список скопирован в буфер обмена');
-    } catch {
-      alert('Не удалось скопировать список');
+
+    document.execCommand('copy');
+
+    const message = 'Список скопирован в буфер обмена';
+
+    if (tg?.showAlert) {
+      tg.showAlert(message);
+    } else {
+      alert(message);
     }
-    document.body.removeChild(textarea);
+  } catch {
+    const errorMessage = 'Не удалось скопировать список';
+
+    if (tg?.showAlert) {
+      tg.showAlert(errorMessage);
+    } else {
+      alert(errorMessage);
+    }
+  } finally {
+    const textarea = document.querySelector(
+      'textarea[data-share-copy="true"]'
+    );
+
+    if (textarea) {
+      textarea.remove();
+    }
   }
 };
