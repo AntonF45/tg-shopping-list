@@ -80,14 +80,24 @@ const App: React.FC = () => {
         onDelete={deleteList}
       />
 
-      <div className="item-list">
-        <ProgressFieldset items={list.items} />
-        <ItemList
-          items={list.items}
-          onToggle={toggleItem}
-          onRemove={removeItem}
+      <main className="app-main">
+        {/* Форма добавления — обязательно должна быть здесь */}
+        <AddItemForm
+          onAdd={handleAdd}
+          onFocusChange={handleFocusChange}
+          recentItems={recentItems}
         />
-      </div>
+
+        {/* Блок чек-листа с встроенным label "X из Y" */}
+        <div className="item-list">
+          <ProgressFieldset items={list.items} />
+          <ItemList
+            items={list.items}
+            onToggle={toggleItem}
+            onRemove={removeItem}
+          />
+        </div>
+      </main>
 
       <ShareButton
         items={list.items}
