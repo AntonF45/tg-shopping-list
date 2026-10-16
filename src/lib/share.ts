@@ -114,7 +114,7 @@ const buildListText = (
   }
 
   lines.push('');
-  lines.push('Создано в Mossforge');
+  lines.push('Создано в Купи - mini app');
 
   return lines.join('\n');
 };
@@ -209,6 +209,8 @@ export const shareList = async (
     textarea.value = text;
     textarea.style.position = 'fixed';
     textarea.style.opacity = '0';
+
+    textarea.setAttribute('data-share-copy', 'true');
 
     document.body.appendChild(textarea);
     textarea.select();
