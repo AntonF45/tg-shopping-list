@@ -96,6 +96,7 @@ const App: React.FC = () => {
 
       <ShareButton
         items={list.items}
+        listTitle={list.title}  // ← ДОБАВЛЕНО
         onClearDone={clearDone}
         isHidden={isInputFocused}
       />
