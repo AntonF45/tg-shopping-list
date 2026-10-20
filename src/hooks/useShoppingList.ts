@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { ShoppingList, AddItemInput, Unit } from '../types/shopping';
+import { ShoppingList, AddItemInput } from '../types/shopping';
 import { localStorageRepository } from '../storage/localStorageRepository';
 import { logEvent } from '../lib/analytics';
 import { triggerHaptic } from '../lib/telegram';
@@ -39,7 +39,7 @@ export const useShoppingList = () => {
       }
 
       // Формируем полное имя с единицей измерения, если она указана и не 'шт'
-      const fullName = input.unit && input.unit !== 'шт' && input.unit !== ''
+      const fullName = input.unit && input.unit !== 'шт'
         ? `${input.name} (${input.unit})`
         : input.name;
 

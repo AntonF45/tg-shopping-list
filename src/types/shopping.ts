@@ -5,6 +5,7 @@ export interface ShoppingItem {
   id: string;
   name: string;
   qty?: string;
+  unit?: Unit;
   category?: Category;
   isDone: boolean;
   createdAt: number;
@@ -18,7 +19,6 @@ export interface ShoppingList {
   updatedAt: number;
 }
 
-// НОВЫЙ ТИП: хранилище всех списков
 export interface ShoppingListsStore {
   version: number;
   activeListId: string;
@@ -28,6 +28,7 @@ export interface ShoppingListsStore {
 export interface AddItemInput {
   name: string;
   qty?: string;
+  unit?: Unit;
   category?: Category;
 }
 
