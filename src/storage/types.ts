@@ -2,14 +2,19 @@ import {
   ShoppingList, 
   ShoppingItem, 
   AddItemInput, 
-  AddItemResult, 
-  ShoppingListsStore 
+  AddItemResult,  
 } from '../types/shopping';
 
 export interface ListStorage {
   getList(): Promise<ShoppingList>;
   saveList(list: ShoppingList): Promise<void>;
   clear(): Promise<void>;
+}
+
+export interface ShoppingListsStore {
+  version: number;
+  activeListId: string;
+  lists: ShoppingList[];
 }
 
 export interface ShoppingListRepository {
