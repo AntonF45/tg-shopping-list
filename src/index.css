@@ -850,7 +850,56 @@ input {
   color: var(--text-muted);
 }
 
-/* Кнопка "Добавить" — квадратная, как +/- */
+/* === НОВЫЙ БЛОК ВВОДА ТОВАРА === */
+.product-input-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+  background: var(--surface);
+  padding: var(--space-3);
+  border-radius: var(--radius-lg);
+  border: var(--border-width) solid var(--border);
+  box-shadow: var(--shadow-1);
+}
+
+/* Верхняя строка: инпут + кнопка добавить */
+.product-top-row {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.product-name-wrapper {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+.product-name-input {
+  width: 100%;
+  height: var(--tap);
+  padding: 0 var(--space-3);
+  font-size: var(--text-base);
+  font-weight: 500;
+  color: var(--text);
+  background: var(--bg);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-md);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.product-name-input:focus {
+  border-color: var(--accent-strong);
+  box-shadow: 0 0 0 3px var(--accent-ring);
+}
+
+.product-name-input::placeholder {
+  color: var(--text-muted);
+}
+
+/* Кнопка "Добавить" */
 .btn-add-product {
   width: var(--tap);
   height: var(--tap);
@@ -877,40 +926,40 @@ input {
   box-shadow: none;
 }
 
-/* Кнопка-тоггл количества */
+/* Кнопка-тоггл количества — только стрелка, компактная */
 .qty-toggle {
+  align-self: center;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  padding: var(--space-2) var(--space-3);
+  justify-content: center;
   background: var(--surface-2);
   border: var(--border-width) solid var(--border);
-  border-radius: var(--radius-md);
+  border-radius: 50%;
   cursor: pointer;
-  transition: background-color 0.2s;
+  padding: 0;
+  transition: background-color 0.2s, transform 0.15s;
 }
 
 .qty-toggle:hover {
   background: var(--bg);
 }
 
-.qty-toggle-label {
-  font-size: var(--text-sm);
-  font-weight: 600;
-  color: var(--text-muted);
+.qty-toggle:active {
+  transform: scale(0.92);
 }
 
 .qty-toggle-icon {
-  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   color: var(--text-muted);
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .qty-toggle-icon--open {
   transform: rotate(180deg);
 }
 
-/* Сворачиваемый блок количества */
+/* Сворачиваемый блок количества — полное скрытие */
 .qty-unit-block {
   display: grid;
   grid-template-rows: 0fr;
@@ -922,8 +971,13 @@ input {
   grid-template-rows: 1fr;
 }
 
-.qty-unit-block > div {
+/* Обёртка контента — без margin, только gap у родителя */
+.qty-unit-block-inner {
   min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  overflow: hidden;
 }
 
 .qty-counter-large {
@@ -934,10 +988,9 @@ input {
   padding: var(--space-2);
   border-radius: var(--radius-md);
   border: var(--border-width) solid var(--border);
-  margin-bottom: var(--space-2);
 }
 
-/* Кнопки +/- — единый размер с кнопкой "Добавить" */
+/* Кнопки +/- */
 .qty-btn {
   width: var(--tap);
   height: var(--tap);
@@ -978,19 +1031,17 @@ input {
   font-weight: 500;
 }
 
-/* Единицы измерения — высота как у чипсов */
+/* Единицы измерения — grid для точного размещения 7 кнопок */
 .unit-buttons {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
   gap: var(--space-1);
 }
 
 .unit-btn {
-  flex: 1;
-  min-width: 44px;
   height: var(--tap-sm);
-  padding: 0 var(--space-2);
-  font-size: var(--text-sm);
+  padding: 0 var(--space-1);
+  font-size: 11px;
   font-weight: 600;
   color: var(--text-muted);
   background: var(--surface-2);
@@ -998,6 +1049,9 @@ input {
   border-radius: var(--radius-pill);
   cursor: pointer;
   transition: background-color 0.2s, color 0.2s, border-color 0.2s, transform 0.15s;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .unit-btn:active {

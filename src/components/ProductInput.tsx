@@ -168,18 +168,17 @@ export const ProductInput: React.FC<Props> = ({
         </button>
       </div>
 
-      {/* Кнопка-тоггл количества */}
+      {/* Кнопка-тоггл количества — только стрелка */}
       <button
         type="button"
         className="qty-toggle"
         onClick={toggleQty}
         aria-label={showQty ? 'Скрыть количество' : 'Показать количество'}
       >
-        <span className="qty-toggle-label">Количество</span>
         <svg
           className={`qty-toggle-icon ${showQty ? 'qty-toggle-icon--open' : ''}`}
-          width="16"
-          height="16"
+          width="18"
+          height="18"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -193,69 +192,53 @@ export const ProductInput: React.FC<Props> = ({
 
       {/* Сворачиваемый блок количества */}
       <div className={`qty-unit-block ${showQty ? 'qty-unit-block--visible' : ''}`}>
-        <div className="qty-counter-large">
-          <button
-            type="button"
-            className="qty-btn"
-            onClick={decrementQty}
-            aria-label="Уменьшить количество"
-          >
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <line x1="5" y1="12" x2="19" y2="12" />
-            </svg>
-          </button>
-
-          <input
-            type="text"
-            inputMode="decimal"
-            placeholder="0"
-            value={qty}
-            onChange={handleQtyChange}
-            className="qty-input-large"
-          />
-
-          <button
-            type="button"
-            className="qty-btn"
-            onClick={incrementQty}
-            aria-label="Увеличить количество"
-          >
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <line x1="12" y1="5" x2="12" y2="19" />
-              <line x1="5" y1="12" x2="19" y2="12" />
-            </svg>
-          </button>
-        </div>
-
-        <div className="unit-buttons">
-          {UNITS.map(u => (
+        <div className="qty-unit-block-inner">
+          <div className="qty-counter-large">
             <button
-              key={u}
               type="button"
-              className={`unit-btn ${unit === u ? 'unit-btn--active' : ''}`}
-              onClick={() => handleUnitSelect(u)}
+              className="qty-btn"
+              onClick={decrementQty}
+              aria-label="Уменьшить количество"
             >
-              {u}
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
             </button>
-          ))}
+
+            <input
+              type="text"
+              inputMode="decimal"
+              placeholder="0"
+              value={qty}
+              onChange={handleQtyChange}
+              className="qty-input-large"
+            />
+
+            <button
+              type="button"
+              className="qty-btn"
+              onClick={incrementQty}
+              aria-label="Увеличить количество"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
+            </button>
+          </div>
+
+          <div className="unit-buttons">
+            {UNITS.map(u => (
+              <button
+                key={u}
+                type="button"
+                className={`unit-btn ${unit === u ? 'unit-btn--active' : ''}`}
+                onClick={() => handleUnitSelect(u)}
+              >
+                {u}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
     </div>
