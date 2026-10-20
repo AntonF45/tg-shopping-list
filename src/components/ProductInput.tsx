@@ -18,14 +18,13 @@ export const ProductInput: React.FC<Props> = ({
   const [name, setName] = useState('');
   const [qty, setQty] = useState('');
   const [unit, setUnit] = useState<Unit>('');
+  const [showQty, setShowQty] = useState(true);
   const [showDropdown, setShowDropdown] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLUListElement>(null);
 
   const filteredItems = recentItems
-    .filter(item =>
-      item.toLowerCase().includes(name.toLowerCase())
-    )
+    .filter(item => item.toLowerCase().includes(name.toLowerCase()))
     .slice(0, 5);
 
   useEffect(() => {
@@ -56,6 +55,7 @@ export const ProductInput: React.FC<Props> = ({
     setQty('');
     setUnit('');
     setShowDropdown(false);
+    triggerHaptic('medium');
   };
 
   const handleSelect = (item: string) => {
@@ -98,50 +98,101 @@ export const ProductInput: React.FC<Props> = ({
   };
 
   const handleUnitSelect = (selectedUnit: Unit) => {
-    setUnit(selectedUnit);
+    setUnit(selectedUnit === unit ? '' : selectedUnit);
+    triggerHaptic('light');
+  };
+
+  const toggleQty = () => {
+    setShowQty(!showQty);
     triggerHaptic('light');
   };
 
   return (
     <div className="product-input-container">
-      {/* Поле ввода названия */}
-      <div className="product-name-wrapper">
-        <input
-          ref={inputRef}
-          type="text"
-          placeholder="Название товара"
-          value={name}
-          onChange={e => setName(e.target.value)}
-          onFocus={handleFocus}
-          onBlur={handleBlur}
-          className="product-name-input"
-          autoComplete="off"
-          autoCorrect="off"
-          autoCapitalize="off"
-          spellCheck={false}
-        />
+      {/* Верхняя строка: название + кнопка добавить + тоггл количества */}
+      <div className="product-top-row">
+        <div className="product-name-wrapper">
+          <input
+            ref={inputRef}
+            type="text"
+            placeholder="Название товара"
+            value={name}
+            onChange={e => setName(e.target.value)}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
+            className="product-name-input"
+            autoComplete="off"
+            autoCorrect="off"
+            autoCapitalize="off"
+            spellCheck={false}
+          />
 
-        {/* Dropdown с подсказками */}
-        {showDropdown && filteredItems.length > 0 && (
-          <ul ref={dropdownRef} className="recent-dropdown">
-            {filteredItems.map(item => (
-              <li
-                key={item}
-                className="recent-dropdown-item"
-                onMouseDown={e => {
-                  e.preventDefault();
-                  handleSelect(item);
-                }}
-              >
-                {item}
-              </li>
-            ))}
-          </ul>
-        )}
+          {showDropdown && filteredItems.length > 0 && (
+            <ul ref={dropdownRef} className="recent-dropdown">
+              {filteredItems.map(item => (
+                <li
+                  key={item}
+                  className="recent-dropdown-item"
+                  onMouseDown={e => {
+                    e.preventDefault();
+                    handleSelect(item);
+                  }}
+                >
+                  {item}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        <button
+          type="button"
+          className="btn-add-product"
+          onClick={handleSubmit}
+          disabled={!name.trim()}
+          aria-label="Добавить товар"
+        >
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+        </button>
       </div>
 
-      {/* Блок счетчика с единицами измерения */}
-      <div className="qty-unit-block">
+      {/* Кнопка-тоггл количества */}
+      <button
+        type="button"
+        className="qty-toggle"
+        onClick={toggleQty}
+        aria-label={showQty ? 'Скрыть количество' : 'Показать количество'}
+      >
+        <span className="qty-toggle-label">Количество</span>
+        <svg
+          className={`qty-toggle-icon ${showQty ? 'qty-toggle-icon--open' : ''}`}
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <polyline points="6 9 12 15 18 9" />
+        </svg>
+      </button>
+
+      {/* Сворачиваемый блок количества */}
+      <div className={`qty-unit-block ${showQty ? 'qty-unit-block--visible' : ''}`}>
         <div className="qty-counter-large">
           <button
             type="button"
@@ -194,7 +245,6 @@ export const ProductInput: React.FC<Props> = ({
           </button>
         </div>
 
-        {/* Кнопки единиц измерения */}
         <div className="unit-buttons">
           {UNITS.map(u => (
             <button
@@ -208,29 +258,6 @@ export const ProductInput: React.FC<Props> = ({
           ))}
         </div>
       </div>
-
-      {/* Кнопка добавления (вынесена отдельно) */}
-      <button
-        type="button"
-        className="btn-add-product"
-        onClick={handleSubmit}
-        disabled={!name.trim()}
-      >
-        <svg
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <line x1="12" y1="5" x2="12" y2="19" />
-          <line x1="5" y1="12" x2="19" y2="12" />
-        </svg>
-        <span>Добавить</span>
-      </button>
     </div>
   );
 };

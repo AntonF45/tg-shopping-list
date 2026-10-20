@@ -70,9 +70,11 @@ const App: React.FC = () => {
           onFocusChange={handleFocusChange}
           recentItems={recentItems}
         />
-        <div className="item-list">
-          <ItemList items={list.items} onToggle={toggleItem} onRemove={removeItem} />
-        </div>
+        <ItemList
+          items={list.items}
+          onToggle={toggleItem}
+          onRemove={removeItem}
+        />
       </main>
 
       <ShareButton

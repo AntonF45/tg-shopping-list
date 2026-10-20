@@ -805,22 +805,32 @@ input {
 .product-input-container {
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
+  gap: var(--space-2);
   margin-bottom: var(--space-4);
   background: var(--surface);
-  padding: var(--space-4);
+  padding: var(--space-3);
   border-radius: var(--radius-lg);
   border: var(--border-width) solid var(--border);
   box-shadow: var(--shadow-1);
 }
 
+/* Верхняя строка: инпут + кнопка добавить */
+.product-top-row {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+}
+
 .product-name-wrapper {
   position: relative;
+  flex: 1;
+  min-width: 0;
 }
 
 .product-name-input {
   width: 100%;
-  padding: var(--space-3) var(--space-4);
+  height: var(--tap);
+  padding: 0 var(--space-3);
   font-size: var(--text-base);
   font-weight: 500;
   color: var(--text);
@@ -840,7 +850,168 @@ input {
   color: var(--text-muted);
 }
 
-/* Dropdown (переиспользуем стили из AddItemForm) */
+/* Кнопка "Добавить" — квадратная, как +/- */
+.btn-add-product {
+  width: var(--tap);
+  height: var(--tap);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--accent);
+  color: var(--accent-contrast);
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: transform 0.15s, opacity 0.2s, box-shadow 0.2s;
+  box-shadow: var(--shadow-1);
+}
+
+.btn-add-product:active {
+  transform: scale(0.94);
+}
+
+.btn-add-product:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* Кнопка-тоггл количества */
+.qty-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  background: var(--surface-2);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.qty-toggle:hover {
+  background: var(--bg);
+}
+
+.qty-toggle-label {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.qty-toggle-icon {
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  color: var(--text-muted);
+}
+
+.qty-toggle-icon--open {
+  transform: rotate(180deg);
+}
+
+/* Сворачиваемый блок количества */
+.qty-unit-block {
+  display: grid;
+  grid-template-rows: 0fr;
+  overflow: hidden;
+  transition: grid-template-rows 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.qty-unit-block--visible {
+  grid-template-rows: 1fr;
+}
+
+.qty-unit-block > div {
+  min-height: 0;
+}
+
+.qty-counter-large {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  background: var(--bg);
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+  border: var(--border-width) solid var(--border);
+  margin-bottom: var(--space-2);
+}
+
+/* Кнопки +/- — единый размер с кнопкой "Добавить" */
+.qty-btn {
+  width: var(--tap);
+  height: var(--tap);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-2);
+  border: none;
+  border-radius: var(--radius-md);
+  color: var(--text);
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.qty-btn:active {
+  transform: scale(0.94);
+  background: var(--accent);
+  color: var(--accent-contrast);
+}
+
+.qty-input-large {
+  flex: 1;
+  min-width: 0;
+  height: var(--tap);
+  text-align: center;
+  font-size: var(--text-lg);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+  background: transparent;
+  border: none;
+  outline: none;
+}
+
+.qty-input-large::placeholder {
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+/* Единицы измерения — высота как у чипсов */
+.unit-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+.unit-btn {
+  flex: 1;
+  min-width: 44px;
+  height: var(--tap-sm);
+  padding: 0 var(--space-2);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--surface-2);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s, border-color 0.2s, transform 0.15s;
+}
+
+.unit-btn:active {
+  transform: scale(0.96);
+}
+
+.unit-btn--active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-contrast);
+  font-weight: 700;
+}
+
+/* Dropdown */
 .recent-dropdown {
   position: absolute;
   top: calc(100% + 4px);
@@ -859,8 +1030,17 @@ input {
   animation: dropdown-in 0.15s ease;
 }
 
+.recent-dropdown::-webkit-scrollbar {
+  width: 4px;
+}
+
+.recent-dropdown::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 2px;
+}
+
 .recent-dropdown-item {
-  padding: var(--space-2) var(--space-4);
+  padding: var(--space-2) var(--space-3);
   font-size: var(--text-base);
   color: var(--text);
   cursor: pointer;
@@ -878,126 +1058,6 @@ input {
   background: var(--accent-ring);
 }
 
-/* Блок счетчика и единиц */
-.qty-unit-block {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-
-.qty-counter-large {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  background: var(--bg);
-  padding: var(--space-2);
-  border-radius: var(--radius-md);
-  border: var(--border-width) solid var(--border);
-}
-
-.qty-btn {
-  width: var(--tap);
-  height: var(--tap);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--surface-2);
-  border: none;
-  border-radius: 50%;
-  color: var(--text);
-  cursor: pointer;
-  transition: background-color 0.2s, transform 0.1s;
-}
-
-.qty-btn:active {
-  transform: scale(0.92);
-  background: var(--accent);
-  color: var(--accent-contrast);
-}
-
-.qty-input-large {
-  flex: 1;
-  text-align: center;
-  font-size: var(--text-lg);
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-  color: var(--text);
-  background: transparent;
-  border: none;
-  outline: none;
-  min-width: 80px;
-}
-
-.qty-input-large::placeholder {
-  color: var(--text-muted);
-  font-weight: 500;
-}
-
-/* Кнопки единиц измерения */
-.unit-buttons {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-}
-
-.unit-btn {
-  flex: 1;
-  min-width: 48px;
-  padding: var(--space-2) var(--space-3);
-  font-size: var(--text-sm);
-  font-weight: 600;
-  color: var(--text-muted);
-  background: var(--surface-2);
-  border: var(--border-width) solid var(--border);
-  border-radius: var(--radius-pill);
-  cursor: pointer;
-  transition: background-color 0.2s, color 0.2s, border-color 0.2s;
-}
-
-.unit-btn:hover {
-  background: var(--bg);
-}
-
-.unit-btn:active {
-  transform: scale(0.96);
-}
-
-.unit-btn--active {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--accent-contrast);
-  font-weight: 700;
-}
-
-/* Кнопка добавления товара */
-.btn-add-product {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-2);
-  width: 100%;
-  padding: var(--space-3);
-  background: var(--accent);
-  color: var(--accent-contrast);
-  border: none;
-  border-radius: var(--radius-pill);
-  font-size: var(--text-base);
-  font-weight: 700;
-  cursor: pointer;
-  transition: transform 0.15s, opacity 0.2s, box-shadow 0.2s;
-  box-shadow: var(--shadow-1);
-}
-
-.btn-add-product:active {
-  transform: scale(0.98);
-}
-
-.btn-add-product:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-  box-shadow: none;
-}
-
 @keyframes dropdown-in {
   from {
     opacity: 0;
@@ -1010,7 +1070,10 @@ input {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .recent-dropdown {
-    animation: none;
+  .recent-dropdown,
+  .qty-toggle-icon,
+  .qty-unit-block {
+    animation: none !important;
+    transition: none !important;
   }
 }
