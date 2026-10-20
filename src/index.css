@@ -899,7 +899,7 @@ input {
   color: var(--text-muted);
 }
 
-/* Кнопка "Добавить" */
+/* Кнопка "Добавить" — круглая */
 .btn-add-product {
   width: var(--tap);
   height: var(--tap);
@@ -910,7 +910,7 @@ input {
   background: var(--accent);
   color: var(--accent-contrast);
   border: none;
-  border-radius: var(--radius-md);
+  border-radius: 50%;      /* было var(--radius-md) */
   cursor: pointer;
   transition: transform 0.15s, opacity 0.2s, box-shadow 0.2s;
   box-shadow: var(--shadow-1);
@@ -926,28 +926,30 @@ input {
   box-shadow: none;
 }
 
-/* Кнопка-тоггл количества — только стрелка, компактная */
+/* Кнопка-тоггл количества — только стрелка, без рамки */
 .qty-toggle {
   align-self: center;
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--surface-2);
-  border: var(--border-width) solid var(--border);
-  border-radius: 50%;
+  background: transparent; /* сливается с фоном блока */
+  border: none;            /* убираем обводку */
+  border-radius: 0;
   cursor: pointer;
   padding: 0;
-  transition: background-color 0.2s, transform 0.15s;
+  margin-top: -4px;        /* прижимаем к нижней границе */
+  margin-bottom: -4px;
+  transition: transform 0.15s, opacity 0.2s;
 }
 
 .qty-toggle:hover {
-  background: var(--bg);
+  background: transparent;
 }
 
 .qty-toggle:active {
-  transform: scale(0.92);
+  transform: scale(0.9);
 }
 
 .qty-toggle-icon {
@@ -985,22 +987,22 @@ input {
   align-items: center;
   gap: var(--space-2);
   background: var(--bg);
-  padding: var(--space-2);
+  padding: var(--space-1) var(--space-2);   /* уменьшен вертикальный padding */
   border-radius: var(--radius-md);
   border: var(--border-width) solid var(--border);
 }
 
-/* Кнопки +/- */
+/* Кнопки +/- — круглые */
 .qty-btn {
-  width: var(--tap);
-  height: var(--tap);
+  width: 36px;             /* уменьшено с var(--tap)=44px */
+  height: 36px;
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   background: var(--surface-2);
   border: none;
-  border-radius: var(--radius-md);
+  border-radius: 50%;      /* было var(--radius-md) */
   color: var(--text);
   cursor: pointer;
   transition: background-color 0.2s, transform 0.1s;
@@ -1012,12 +1014,13 @@ input {
   color: var(--accent-contrast);
 }
 
+/* Поле ввода количества — компактное */
 .qty-input-large {
   flex: 1;
   min-width: 0;
-  height: var(--tap);
+  height: 36px;            /* было var(--tap)=44px, теперь как у кнопок */
   text-align: center;
-  font-size: var(--text-lg);
+  font-size: var(--text-base);   /* уменьшено с var(--text-lg) */
   font-weight: 600;
   font-variant-numeric: tabular-nums;
   color: var(--text);
