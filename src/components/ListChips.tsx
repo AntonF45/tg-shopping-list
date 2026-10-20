@@ -193,29 +193,6 @@ export const ListChips: React.FC<Props> = ({
   return (
     <div className="list-chips-wrapper">
       <div className="chips-row" ref={chipsRowRef}>
-        {lists.map((list) => (
-          <div key={list.id} className="chip-wrapper">
-            {editingId === list.id ? (
-              <input
-                type="text"
-                className="chip-input"
-                value={editTitle}
-                onChange={(e) => setEditTitle(e.target.value)}
-                onBlur={() => handleRename(list.id)}
-                onKeyDown={(e) => handleKeyDown(e, 'rename', list.id)}
-                autoFocus
-              />
-            ) : (
-              <ChipButton
-                list={list}
-                isActive={list.id === activeListId}
-                onSelect={() => handleChipClick(list.id)}
-                onLongPress={openMenu}
-              />
-            )}
-          </div>
-        ))}
-
         {isCreating ? (
           <input
             type="text"
@@ -252,6 +229,29 @@ export const ListChips: React.FC<Props> = ({
             </svg>
           </button>
         )}
+
+        {lists.map((list) => (
+          <div key={list.id} className="chip-wrapper">
+            {editingId === list.id ? (
+              <input
+                type="text"
+                className="chip-input"
+                value={editTitle}
+                onChange={(e) => setEditTitle(e.target.value)}
+                onBlur={() => handleRename(list.id)}
+                onKeyDown={(e) => handleKeyDown(e, 'rename', list.id)}
+                autoFocus
+              />
+            ) : (
+              <ChipButton
+                list={list}
+                isActive={list.id === activeListId}
+                onSelect={() => handleChipClick(list.id)}
+                onLongPress={openMenu}
+              />
+            )}
+          </div>
+        ))}
       </div>
 
       {menu && (
@@ -294,7 +294,21 @@ export const ListChips: React.FC<Props> = ({
                   if (target) handleDelete(target.id, target.title);
                 }}
               >
-                
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <polyline points="3 6 5 6 21 6" />
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                  <line x1="10" y1="11" x2="10" y2="17" />
+                  <line x1="14" y1="11" x2="14" y2="17" />
+                </svg>
               </button>
             )}
           </div>
