@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { ShoppingList, AddItemInput } from '../types/shopping';
+import { ShoppingList, AddItemInput, Unit } from '../types/shopping';
 import { localStorageRepository } from '../storage/localStorageRepository';
 import { logEvent } from '../lib/analytics';
 import { triggerHaptic } from '../lib/telegram';
@@ -38,46 +38,42 @@ export const useShoppingList = () => {
         return { item: null, wasDuplicate: false };
       }
 
-      const result = await localStorageRepository.addItem(input);
+      // Формируем полное имя с единицей измерения, если она указана и не 'шт'
+      const fullName = input.unit && input.unit !== 'шт' && input.unit !== ''
+        ? `${input.name} (${input.unit})`
+        : input.name;
 
-      // Добавляем в историю (поднимаем наверх, даже если дубликат)
+      const result = await localStorageRepository.addItem({
+        ...input,
+        name: fullName,
+      });
+
+      // Добавляем в историю (используем оригинальное имя без единицы для чистоты поиска)
       await localStorageRepository.addRecentItem(input.name);
       const updatedRecent = await localStorageRepository.getRecentItems();
       setRecentItems(updatedRecent);
 
-      // Обновляем список в стейте
       setList(prev => {
         if (!prev) return null;
 
-        // Если дубликат — просто обновляем существующий элемент
         if (result.wasDuplicate) {
           return {
             ...prev,
-            items: prev.items.map(i =>
-              i.id === result.item.id ? result.item : i
-            ),
+            items: prev.items.map(i => i.id === result.item.id ? result.item : i),
           };
         }
 
-        // Новый товар — добавляем в конец (если ещё не в списке)
         const exists = prev.items.find(i => i.id === result.item.id);
         if (exists) return prev;
 
-        return {
-          ...prev,
-          items: [...prev.items, result.item],
-        };
+        return { ...prev, items: [...prev.items, result.item] };
       });
 
-      // Вибрация: средняя для дубликата, лёгкая для нового
       triggerHaptic(result.wasDuplicate ? 'medium' : 'light');
 
       logEvent(
         result.wasDuplicate ? 'item_duplicate_increased' : 'item_added',
-        {
-          hasQty: !!input.qty,
-          totalItems: list?.items.length || 0,
-        }
+        { hasQty: !!input.qty, totalItems: list?.items.length || 0 }
       );
 
       return result;
@@ -85,99 +81,52 @@ export const useShoppingList = () => {
     [list?.items.length]
   );
 
-  const toggleItem = useCallback(
-    async (id: string) => {
-      const updatedItem = await localStorageRepository.toggleItem(id);
-      setList(prev => {
-        if (!prev) return null;
-        const newItems = prev.items.map(i =>
-          i.id === id ? updatedItem : i
-        );
-        return { ...prev, items: newItems };
-      });
-      setAllLists(prev =>
-        prev.map(l =>
-          l.id === activeListId
-            ? {
-                ...l,
-                items: l.items.map(i =>
-                  i.id === id ? updatedItem : i
-                ),
-              }
-            : l
-        )
-      );
-      triggerHaptic('medium');
-      logEvent('item_marked_done');
-    },
-    [activeListId]
-  );
+  const toggleItem = useCallback(async (id: string) => {
+    const updatedItem = await localStorageRepository.toggleItem(id);
+    setList(prev => prev ? { ...prev, items: prev.items.map(i => i.id === id ? updatedItem : i) } : null);
+    setAllLists(prev => prev.map(l => l.id === activeListId ? { ...l, items: l.items.map(i => i.id === id ? updatedItem : i) } : l));
+    triggerHaptic('medium');
+    logEvent('item_marked_done');
+  }, [activeListId]);
 
-  const removeItem = useCallback(
-    async (id: string) => {
-      await localStorageRepository.removeItem(id);
-      setList(prev =>
-        prev
-          ? { ...prev, items: prev.items.filter(i => i.id !== id) }
-          : null
-      );
-      setAllLists(prev =>
-        prev.map(l =>
-          l.id === activeListId
-            ? { ...l, items: l.items.filter(i => i.id !== id) }
-            : l
-        )
-      );
-      triggerHaptic('light');
-      logEvent('item_removed');
-    },
-    [activeListId]
-  );
+  const removeItem = useCallback(async (id: string) => {
+    await localStorageRepository.removeItem(id);
+    setList(prev => prev ? { ...prev, items: prev.items.filter(i => i.id !== id) } : null);
+    setAllLists(prev => prev.map(l => l.id === activeListId ? { ...l, items: l.items.filter(i => i.id !== id) } : l));
+    triggerHaptic('light');
+    logEvent('item_removed');
+  }, [activeListId]);
 
   const clearDone = useCallback(async () => {
     const tg = window.Telegram?.WebApp;
-    const confirmDelete = () =>
-      new Promise<boolean>(resolve => {
-        if (tg?.showConfirm) {
-          tg.showConfirm('Удалить все купленные товары?', (ok: boolean) =>
-            resolve(ok)
-          );
-        } else {
-          resolve(window.confirm('Удалить все купленные товары?'));
-        }
-      });
+    const confirmDelete = () => new Promise<boolean>(resolve => {
+      if (tg?.showConfirm) {
+        tg.showConfirm('Удалить все купленные товары?', (ok: boolean) => resolve(ok));
+      } else {
+        resolve(window.confirm('Удалить все купленные товары?'));
+      }
+    });
 
     const confirmed = await confirmDelete();
     if (!confirmed) return;
 
     await localStorageRepository.clearDone();
-    setList(prev =>
-      prev ? { ...prev, items: prev.items.filter(i => !i.isDone) } : null
-    );
-    setAllLists(prev =>
-      prev.map(l =>
-        l.id === activeListId
-          ? { ...l, items: l.items.filter(i => !i.isDone) }
-          : l
-      )
-    );
+    setList(prev => prev ? { ...prev, items: prev.items.filter(i => !i.isDone) } : null);
+    setAllLists(prev => prev.map(l => l.id === activeListId ? { ...l, items: l.items.filter(i => !i.isDone) } : l));
     triggerHaptic('heavy');
     logEvent('list_cleared');
   }, [activeListId]);
 
-  const setActiveList = useCallback(
-    async (id: string) => {
-      await localStorageRepository.setActiveList(id);
-      const store = await localStorageRepository.getAllLists();
-      const newList = store.lists.find(l => l.id === id);
-      if (newList) {
-        setList(newList);
-        setActiveListId(id);
-        triggerHaptic('light');
-      }
-    },
-    []
-  );
+  const setActiveList = useCallback(async (id: string) => {
+    await localStorageRepository.setActiveList(id);
+    const store = await localStorageRepository.getAllLists();
+    const newList = store.lists.find(l => l.id === id);
+    if (newList) {
+      setList(newList);
+      setActiveListId(id);
+      triggerHaptic('light');
+    }
+  }, []);
 
   const createList = useCallback(async (title: string) => {
     const newList = await localStorageRepository.createList(title);
@@ -188,19 +137,16 @@ export const useShoppingList = () => {
     logEvent('list_created');
   }, []);
 
-  const renameList = useCallback(
-    async (id: string, newTitle: string) => {
-      await localStorageRepository.renameList(id, newTitle);
-      const store = await localStorageRepository.getAllLists();
-      setAllLists(store.lists);
-      if (id === activeListId) {
-        const updated = store.lists.find(l => l.id === id);
-        if (updated) setList(updated);
-      }
-      triggerHaptic('light');
-    },
-    [activeListId]
-  );
+  const renameList = useCallback(async (id: string, newTitle: string) => {
+    await localStorageRepository.renameList(id, newTitle);
+    const store = await localStorageRepository.getAllLists();
+    setAllLists(store.lists);
+    if (id === activeListId) {
+      const updated = store.lists.find(l => l.id === id);
+      if (updated) setList(updated);
+    }
+    triggerHaptic('light');
+  }, [activeListId]);
 
   const deleteList = useCallback(async (id: string) => {
     await localStorageRepository.deleteList(id);
@@ -215,18 +161,8 @@ export const useShoppingList = () => {
   }, []);
 
   return {
-    list,
-    allLists,
-    activeListId,
-    recentItems,
-    isLoading,
-    addItem,
-    toggleItem,
-    removeItem,
-    clearDone,
-    setActiveList,
-    createList,
-    renameList,
-    deleteList,
+    list, allLists, activeListId, recentItems, isLoading,
+    addItem, toggleItem, removeItem, clearDone,
+    setActiveList, createList, renameList, deleteList,
   };
 };

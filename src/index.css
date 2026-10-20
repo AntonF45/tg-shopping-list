@@ -800,3 +800,217 @@ input {
     scroll-behavior: auto !important;
   }
 }
+
+/* === НОВЫЙ БЛОК ВВОДА ТОВАРА === */
+.product-input-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+  background: var(--surface);
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  border: var(--border-width) solid var(--border);
+  box-shadow: var(--shadow-1);
+}
+
+.product-name-wrapper {
+  position: relative;
+}
+
+.product-name-input {
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--text-base);
+  font-weight: 500;
+  color: var(--text);
+  background: var(--bg);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-md);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.product-name-input:focus {
+  border-color: var(--accent-strong);
+  box-shadow: 0 0 0 3px var(--accent-ring);
+}
+
+.product-name-input::placeholder {
+  color: var(--text-muted);
+}
+
+/* Dropdown (переиспользуем стили из AddItemForm) */
+.recent-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 100;
+  max-height: calc(var(--tap) * 5 + var(--space-2) * 4);
+  overflow-y: auto;
+  margin: 0;
+  padding: var(--space-1) 0;
+  list-style: none;
+  background: var(--surface);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-2);
+  animation: dropdown-in 0.15s ease;
+}
+
+.recent-dropdown-item {
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--text-base);
+  color: var(--text);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.recent-dropdown-item:hover {
+  background: var(--surface-2);
+}
+
+.recent-dropdown-item:active {
+  background: var(--accent-ring);
+}
+
+/* Блок счетчика и единиц */
+.qty-unit-block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.qty-counter-large {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  background: var(--bg);
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+  border: var(--border-width) solid var(--border);
+}
+
+.qty-btn {
+  width: var(--tap);
+  height: var(--tap);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-2);
+  border: none;
+  border-radius: 50%;
+  color: var(--text);
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.qty-btn:active {
+  transform: scale(0.92);
+  background: var(--accent);
+  color: var(--accent-contrast);
+}
+
+.qty-input-large {
+  flex: 1;
+  text-align: center;
+  font-size: var(--text-lg);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+  background: transparent;
+  border: none;
+  outline: none;
+  min-width: 80px;
+}
+
+.qty-input-large::placeholder {
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+/* Кнопки единиц измерения */
+.unit-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.unit-btn {
+  flex: 1;
+  min-width: 48px;
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--surface-2);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.unit-btn:hover {
+  background: var(--bg);
+}
+
+.unit-btn:active {
+  transform: scale(0.96);
+}
+
+.unit-btn--active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-contrast);
+  font-weight: 700;
+}
+
+/* Кнопка добавления товара */
+.btn-add-product {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  width: 100%;
+  padding: var(--space-3);
+  background: var(--accent);
+  color: var(--accent-contrast);
+  border: none;
+  border-radius: var(--radius-pill);
+  font-size: var(--text-base);
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s, opacity 0.2s, box-shadow 0.2s;
+  box-shadow: var(--shadow-1);
+}
+
+.btn-add-product:active {
+  transform: scale(0.98);
+}
+
+.btn-add-product:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+@keyframes dropdown-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .recent-dropdown {
+    animation: none;
+  }
+}

@@ -1,10 +1,10 @@
-import { ShoppingList, ShoppingItem, AddItemInput, AddItemResult } from '../types/shopping';
-
-export interface ShoppingListsStore {
-  version: number;
-  activeListId: string;
-  lists: ShoppingList[];
-}
+import { 
+  ShoppingList, 
+  ShoppingItem, 
+  AddItemInput, 
+  AddItemResult, 
+  ShoppingListsStore 
+} from '../types/shopping';
 
 export interface ListStorage {
   getList(): Promise<ShoppingList>;

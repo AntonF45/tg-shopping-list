@@ -1,26 +1,17 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useShoppingList } from './hooks/useShoppingList';
-import { AddItemForm } from './components/AddItemForm';
+import { ProductInput } from './components/ProductInput';
 import { ItemList } from './components/ItemList';
 import { ShareButton } from './components/ShareButton';
 import { ListChips } from './components/ListChips';
 import { Toast } from './components/Toast';
+import { Unit } from './types/shopping';
 
 const App: React.FC = () => {
   const {
-    list,
-    allLists,
-    activeListId,
-    recentItems,
-    isLoading,
-    addItem,
-    toggleItem,
-    removeItem,
-    clearDone,
-    setActiveList,
-    createList,
-    renameList,
-    deleteList,
+    list, allLists, activeListId, recentItems, isLoading,
+    addItem, toggleItem, removeItem, clearDone,
+    setActiveList, createList, renameList, deleteList,
   } = useShoppingList();
 
   const [isInputFocused, setIsInputFocused] = useState(false);
@@ -32,7 +23,6 @@ const App: React.FC = () => {
       window.clearTimeout(blurTimerRef.current);
       blurTimerRef.current = null;
     }
-
     if (focused) {
       setIsInputFocused(true);
     } else {
@@ -51,8 +41,8 @@ const App: React.FC = () => {
   }, []);
 
   const handleAdd = useCallback(
-    async (name: string, qty: string) => {
-      const result = await addItem({ name, qty });
+    async (name: string, qty: string, unit: Unit) => {
+      const result = await addItem({ name, qty, unit });
       if (result.wasDuplicate) {
         setToast({ message: 'Товар уже в списке — количество увеличено' });
       }
@@ -60,13 +50,8 @@ const App: React.FC = () => {
     [addItem]
   );
 
-  if (isLoading) {
-    return <div className="loading">Загрузка...</div>;
-  }
-
-  if (!list) {
-    return <div className="error">Ошибка загрузки данных</div>;
-  }
+  if (isLoading) return <div className="loading">Загрузка...</div>;
+  if (!list) return <div className="error">Ошибка загрузки данных</div>;
 
   return (
     <div className="app-container">
@@ -80,33 +65,24 @@ const App: React.FC = () => {
       />
 
       <main className="app-main">
-        {/* Форма добавления — обязательно должна быть здесь */}
-        <AddItemForm
+        <ProductInput
           onAdd={handleAdd}
           onFocusChange={handleFocusChange}
           recentItems={recentItems}
         />
-
-        <ItemList
-          items={list.items}
-          onToggle={toggleItem}
-          onRemove={removeItem}
-        />
+        <div className="item-list">
+          <ItemList items={list.items} onToggle={toggleItem} onRemove={removeItem} />
+        </div>
       </main>
 
       <ShareButton
         items={list.items}
-        listTitle={list.title}  // ← ДОБАВЛЕНО
+        listTitle={list.title}
         onClearDone={clearDone}
         isHidden={isInputFocused}
       />
 
-      {toast && (
-        <Toast
-          message={toast.message}
-          onClose={() => setToast(null)}
-        />
-      )}
+      {toast && <Toast message={toast.message} onClose={() => setToast(null)} />}
     </div>
   );
 };

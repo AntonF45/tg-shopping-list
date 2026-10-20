@@ -1,4 +1,5 @@
 export type Category = 'groceries' | 'household' | 'pharmacy' | 'other';
+export type Unit = 'шт' | 'кг' | 'г' | 'л' | 'мл' | 'уп' | 'пач' | '';
 
 export interface ShoppingItem {
   id: string;
