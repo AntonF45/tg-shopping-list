@@ -127,10 +127,10 @@ export const ProductInput: React.FC<Props> = ({
               }
             }}
             className="product-name-input"
-            autoComplete="off"
-            autoCorrect="off"
-            autoCapitalize="off"
-            spellCheck={false}
+            autoComplete="on"
+            autoCorrect="on"
+            autoCapitalize="sentences"
+            spellCheck={true}
             enterKeyHint="done"
           />
 
