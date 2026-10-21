@@ -211,8 +211,8 @@ export const ProductInput: React.FC<Props> = ({
               placeholder="0"
               value={qty}
               onChange={handleQtyChange}
-              onFocus={handleFocus}
-              onBlur={handleBlur} 
+              onFocus={() => onFocusChange?.(true)}
+              onBlur={() => onFocusChange?.(false)}
               className="qty-input-large"
             />
 
