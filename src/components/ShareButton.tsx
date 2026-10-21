@@ -1,6 +1,7 @@
 import React from 'react';
 import { ShoppingItem } from '../types/shopping';
 import { shareList } from '../lib/share';
+import { triggerHaptic } from '../lib/telegram';
 
 interface Props {
   items: ShoppingItem[];
@@ -26,7 +27,10 @@ export const ShareButton: React.FC<Props> = ({
       {hasDoneItems && (
         <button
           className="btn-clear-island"
-          onClick={onClearDone}
+          onClick={() => {
+            triggerHaptic('light');
+            onClearDone();
+          }}
           type="button"
         >
           <span>Очистить</span>
@@ -35,12 +39,14 @@ export const ShareButton: React.FC<Props> = ({
 
       <button
         className="btn-share-island"
-        onClick={() => shareList(items, { listTitle })}
+        onClick={() => {
+          triggerHaptic('light');
+          shareList(items, { listTitle });
+        }}
         type="button"
       >
         <span>Отправить в чат</span>
       </button>
-    
     </div>
   );
 };
