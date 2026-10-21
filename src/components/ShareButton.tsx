@@ -4,7 +4,7 @@ import { shareList } from '../lib/share';
 
 interface Props {
   items: ShoppingItem[];
-  listTitle?: string; // ← ДОБАВЛЕНО
+  listTitle?: string;
   onClearDone: () => void;
   isHidden?: boolean;
 }
@@ -23,14 +23,6 @@ export const ShareButton: React.FC<Props> = ({
 
   return (
     <div className={`floating-actions ${isHidden ? 'floating-actions--hidden' : ''}`}>
-      <button
-        className="btn-share-island"
-        onClick={() => shareList(items, { listTitle })}
-        type="button"
-      >
-        <span>Отправить в чат</span>
-      </button>
-
       {hasDoneItems && (
         <button
           className="btn-clear-island"
@@ -40,6 +32,15 @@ export const ShareButton: React.FC<Props> = ({
           <span>Очистить</span>
         </button>
       )}
+
+      <button
+        className="btn-share-island"
+        onClick={() => shareList(items, { listTitle })}
+        type="button"
+      >
+        <span>Отправить в чат</span>
+      </button>
+    
     </div>
   );
 };
