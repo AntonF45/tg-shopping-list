@@ -9,6 +9,7 @@ interface Props {
   onCreate: (title: string) => void | Promise<void>;
   onRename: (id: string, newTitle: string) => void | Promise<void>;
   onDelete: (id: string) => void | Promise<void>;
+  onFocusChange?: (isFocused: boolean) => void;
 }
 
 interface MenuState {
@@ -24,6 +25,7 @@ export const ListChips: React.FC<Props> = ({
   onCreate,
   onRename,
   onDelete,
+  onFocusChange,
 }) => {
   const [isCreating, setIsCreating] = useState(false);
   const [newTitle, setNewTitle] = useState('');
@@ -200,7 +202,11 @@ export const ListChips: React.FC<Props> = ({
             placeholder="Название"
             value={newTitle}
             onChange={(e) => setNewTitle(e.target.value)}
-            onBlur={handleCreate}
+            onFocus={() => onFocusChange?.(true)}
+            onBlur={() => {
+              handleCreate();
+              onFocusChange?.(false);
+            }}
             onKeyDown={(e) => handleKeyDown(e, 'create')}
             autoFocus
           />
@@ -238,7 +244,11 @@ export const ListChips: React.FC<Props> = ({
                 className="chip-input"
                 value={editTitle}
                 onChange={(e) => setEditTitle(e.target.value)}
-                onBlur={() => handleRename(list.id)}
+                onFocus={() => onFocusChange?.(true)}
+                onBlur={() => {
+                  handleRename(list.id);
+                  onFocusChange?.(false);
+                }}
                 onKeyDown={(e) => handleKeyDown(e, 'rename', list.id)}
                 autoFocus
               />

@@ -62,6 +62,7 @@ const App: React.FC = () => {
         onCreate={createList}
         onRename={renameList}
         onDelete={deleteList}
+        onFocusChange={handleFocusChange}
       />
 
       <main className="app-main">
