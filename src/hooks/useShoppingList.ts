@@ -39,13 +39,11 @@ export const useShoppingList = () => {
       }
 
       // Формируем полное имя с единицей измерения, если она указана и не 'шт'
-      const fullName = input.unit && input.unit !== 'шт'
-        ? `${input.name} (${input.unit})`
-        : input.name;
+      
 
       const result = await localStorageRepository.addItem({
         ...input,
-        name: fullName,
+        name: input.name,
       });
 
       // Добавляем в историю (используем оригинальное имя без единицы для чистоты поиска)

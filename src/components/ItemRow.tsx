@@ -34,22 +34,22 @@ export const ItemRow: React.FC<Props> = ({ item, onToggle, onRemove }) => {
       <input
         type="checkbox"
         checked={item.isDone}
-        onChange={() => {
-          triggerHaptic('light');
-          onToggle(item.id);
-        }}
-        id={`item-${item.id}`}
+        onChange={() => onToggle(item.id)}
         className="checklist-checkbox"
       />
-      <label htmlFor={`item-${item.id}`} className="checklist-label">
+      <label className="checklist-label">
         <span className="item-name">{item.name}</span>
-        {item.qty && <span className="item-qty">× {item.qty}</span>}
+        {item.qty && (
+          <span className="item-qty">
+            — {item.qty}{item.unit ? ` ${item.unit}` : ''}
+          </span>
+        )}
       </label>
-      <button 
-        className="btn-remove-item" 
-        onClick={handleRemove}
-        aria-label="Удалить"
+      <button
         type="button"
+        className="btn-remove-item"
+        onClick={() => onRemove(item.id)}
+        aria-label="Удалить товар"
       >
         ✕
       </button>

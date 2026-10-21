@@ -588,6 +588,7 @@ input {
   font-size: var(--text-sm);
   color: var(--text-muted);
   font-variant-numeric: tabular-nums;
+  margin-left: auto;
 }
 
 .btn-remove-item {
