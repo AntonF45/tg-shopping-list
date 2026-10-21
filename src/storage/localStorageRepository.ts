@@ -124,6 +124,7 @@ export const localStorageRepository: ShoppingListRepository = {
       id: crypto.randomUUID(),
       name: input.name.trim(),
       qty: input.qty?.trim(),
+      unit: input.unit,
       category: input.category || 'other',
       isDone: false,
       createdAt: now,
