@@ -1,5 +1,6 @@
 import { ShoppingItem } from '../types/shopping';
 
+const BOT_USERNAME = 'KupiShopList_bot';
 interface ShareOptions {
   listTitle?: string;
   includeDone?: boolean;
@@ -114,7 +115,8 @@ const buildListText = (
   }
 
   lines.push('');
-  lines.push('Создано в Купи - mini app');
+  lines.push('Создано в Купи. - Mini App');
+  lines.push(`https://t.me/${BOT_USERNAME}`);
 
   return lines.join('\n');
 };
