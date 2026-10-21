@@ -547,7 +547,7 @@ input {
   min-width: 0;
   display: flex;
   align-items: baseline;
-  gap: 8px;
+  gap: var(--space-2); /* Отступ между названием и количеством */
   cursor: pointer;
   color: var(--text);
   transition: color 0.3s ease;
@@ -581,6 +581,7 @@ input {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  flex-shrink: 1;
 }
 
 .item-qty {
@@ -588,7 +589,6 @@ input {
   font-size: var(--text-sm);
   color: var(--text-muted);
   font-variant-numeric: tabular-nums;
-  margin-left: auto;
 }
 
 .btn-remove-item {

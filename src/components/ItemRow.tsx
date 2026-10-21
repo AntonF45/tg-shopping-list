@@ -12,7 +12,6 @@ export const ItemRow: React.FC<Props> = ({ item, onToggle, onRemove }) => {
   const handleRemove = () => {
     const tg = window.Telegram?.WebApp;
     
-    // Используем нативный диалог Telegram, если доступен
     if (tg?.showConfirm) {
       tg.showConfirm(`Удалить "${item.name}"?`, (confirmed: boolean) => {
         if (confirmed) {
@@ -21,7 +20,6 @@ export const ItemRow: React.FC<Props> = ({ item, onToggle, onRemove }) => {
         }
       });
     } else {
-      // Фоллбэк для обычного браузера
       if (window.confirm(`Удалить "${item.name}"?`)) {
         triggerHaptic('medium');
         onRemove(item.id);
@@ -33,11 +31,12 @@ export const ItemRow: React.FC<Props> = ({ item, onToggle, onRemove }) => {
     <div className="checklist-item">
       <input
         type="checkbox"
+        id={`item-${item.id}`} /* <-- 1. ДОБАВЛЯЕМ ID */
         checked={item.isDone}
         onChange={() => onToggle(item.id)}
         className="checklist-checkbox"
       />
-      <label className="checklist-label">
+      <label htmlFor={`item-${item.id}`} className="checklist-label"> {/* <-- 2. ДОБАВЛЯЕМ htmlFor */}
         <span className="item-name">{item.name}</span>
         {item.qty && (
           <span className="item-qty">
