@@ -17,8 +17,8 @@ export const ProductInput: React.FC<Props> = ({
 }) => {
   const [name, setName] = useState('');
   const [qty, setQty] = useState('');
-  const [unit, setUnit] = useState<Unit>('');
-  const [showQty, setShowQty] = useState(true);
+  const [unit, setUnit] = useState<Unit>('шт'); // По умолчанию "шт"
+  const [showQty, setShowQty] = useState(false); // По умолчанию скрыто
   const [showDropdown, setShowDropdown] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLUListElement>(null);
@@ -53,7 +53,7 @@ export const ProductInput: React.FC<Props> = ({
     await onAdd(name, qty, unit);
     setName('');
     setQty('');
-    setUnit('');
+    setUnit('шт'); // Сброс к значению по умолчанию
     setShowDropdown(false);
     triggerHaptic('medium');
   };
@@ -97,8 +97,8 @@ export const ProductInput: React.FC<Props> = ({
     setTimeout(() => setShowDropdown(false), 150);
   };
 
-  const handleUnitSelect = (selectedUnit: Unit) => {
-    setUnit(selectedUnit === unit ? '' : selectedUnit);
+  const handleUnitChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setUnit(e.target.value as Unit);
     triggerHaptic('light');
   };
 
@@ -109,7 +109,7 @@ export const ProductInput: React.FC<Props> = ({
 
   return (
     <div className="product-input-container">
-      {/* Верхняя строка: название + кнопка добавить + тоггл количества */}
+      {/* Верхняя строка: название + кнопка добавить */}
       <div className="product-top-row">
         <div className="product-name-wrapper">
           <input
@@ -120,11 +120,18 @@ export const ProductInput: React.FC<Props> = ({
             onChange={e => setName(e.target.value)}
             onFocus={handleFocus}
             onBlur={handleBlur}
+            onKeyDown={e => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                handleSubmit();
+              }
+            }}
             className="product-name-input"
             autoComplete="off"
             autoCorrect="off"
             autoCapitalize="off"
             spellCheck={false}
+            enterKeyHint="done"
           />
 
           {showDropdown && filteredItems.length > 0 && (
@@ -190,10 +197,10 @@ export const ProductInput: React.FC<Props> = ({
         </svg>
       </button>
 
-      {/* Сворачиваемый блок количества */}
+      {/* Сворачиваемый блок: количество и единицы в одной строке */}
       <div className={`qty-unit-block ${showQty ? 'qty-unit-block--visible' : ''}`}>
         <div className="qty-unit-block-inner">
-          <div className="qty-counter-large">
+          <div className="qty-counter-compact">
             <button
               type="button"
               className="qty-btn"
@@ -213,7 +220,7 @@ export const ProductInput: React.FC<Props> = ({
               onChange={handleQtyChange}
               onFocus={() => onFocusChange?.(true)}
               onBlur={() => onFocusChange?.(false)}
-              className="qty-input-large"
+              className="qty-input-compact"
             />
 
             <button
@@ -227,19 +234,16 @@ export const ProductInput: React.FC<Props> = ({
                 <line x1="5" y1="12" x2="19" y2="12" />
               </svg>
             </button>
-          </div>
 
-          <div className="unit-buttons">
-            {UNITS.map(u => (
-              <button
-                key={u}
-                type="button"
-                className={`unit-btn ${unit === u ? 'unit-btn--active' : ''}`}
-                onClick={() => handleUnitSelect(u)}
-              >
-                {u}
-              </button>
-            ))}
+            <select
+              value={unit}
+              onChange={handleUnitChange}
+              className="unit-select"
+            >
+              {UNITS.map(u => (
+                <option key={u} value={u}>{u}</option>
+              ))}
+            </select>
           </div>
         </div>
       </div>

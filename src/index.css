@@ -983,15 +983,6 @@ input {
   overflow: hidden;
 }
 
-.qty-counter-large {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  background: var(--bg);
-  padding: var(--space-1) var(--space-2);   /* уменьшен вертикальный padding */
-  border-radius: var(--radius-md);
-  border: var(--border-width) solid var(--border);
-}
 
 /* Кнопки +/- — круглые */
 .qty-btn {
@@ -1009,19 +1000,46 @@ input {
   transition: background-color 0.2s, transform 0.1s;
 }
 
+/* УДАЛИТЬ старые блоки .qty-counter-large, .qty-input-large, .unit-buttons, .unit-btn */
+
+/* Новый компактный блок: [-] [input] [+] [select] в одной строке */
+.qty-counter-compact {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  background: var(--bg);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-md);
+  border: var(--border-width) solid var(--border);
+}
+
+.qty-btn {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-2);
+  border: none;
+  border-radius: 50%;
+  color: var(--text);
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
 .qty-btn:active {
   transform: scale(0.94);
   background: var(--accent);
   color: var(--accent-contrast);
 }
 
-/* Поле ввода количества — компактное */
-.qty-input-large {
+.qty-input-compact {
   flex: 1;
-  min-width: 0;
-  height: 36px;            /* было var(--tap)=44px, теперь как у кнопок */
+  min-width: 60px;
+  height: 36px;
   text-align: center;
-  font-size: var(--text-base);   /* уменьшено с var(--text-lg) */
+  font-size: var(--text-base);
   font-weight: 600;
   font-variant-numeric: tabular-nums;
   color: var(--text);
@@ -1030,32 +1048,56 @@ input {
   outline: none;
 }
 
-.qty-input-large::placeholder {
+.qty-input-compact::placeholder {
   color: var(--text-muted);
   font-weight: 500;
 }
 
-/* Единицы измерения — grid для точного размещения 7 кнопок */
-.unit-buttons {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: var(--space-1);
-}
-
-.unit-btn {
-  height: var(--tap-sm);
-  padding: 0 var(--space-1);
-  font-size: 11px;
+/* Выпадающий список единиц измерения */
+.unit-select {
+  flex-shrink: 0;
+  width: 70px;
+  height: 36px;
+  padding: 0 var(--space-2);
+  font-size: var(--text-sm);
   font-weight: 600;
-  color: var(--text-muted);
+  color: var(--text);
   background: var(--surface-2);
   border: var(--border-width) solid var(--border);
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-md);
   cursor: pointer;
-  transition: background-color 0.2s, color 0.2s, border-color 0.2s, transform 0.15s;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%235f7268' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  padding-right: 24px;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.unit-select:focus {
+  border-color: var(--accent-strong);
+}
+
+.unit-select:active {
+  transform: scale(0.98);
+}
+
+/* Убираем стандартную стрелку на iOS */
+.unit-select::-ms-expand {
+  display: none;
+}
+
+.qty-btn:active {
+  transform: scale(0.94);
+  background: var(--accent);
+  color: var(--accent-contrast);
+}
+
+.qty-input-large::placeholder {
+  color: var(--text-muted);
+  font-weight: 500;
 }
 
 .unit-btn:active {
