@@ -114,8 +114,6 @@ const buildListText = (
     lines.push(`✅ ${doneItems.length} ${doneWord}`);
   }
 
-  lines.push('');
-  lines.push('Создано в Купи. - Mini App');
   lines.push(`https://t.me/${BOT_USERNAME}`);
 
   return lines.join('\n');
