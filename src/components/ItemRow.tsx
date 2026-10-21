@@ -48,7 +48,7 @@ export const ItemRow: React.FC<Props> = ({ item, onToggle, onRemove }) => {
       <button
         type="button"
         className="btn-remove-item"
-        onClick={() => onRemove(item.id)}
+        onClick={handleRemove}
         aria-label="Удалить товар"
       >
         ✕
