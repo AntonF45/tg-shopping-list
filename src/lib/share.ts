@@ -29,15 +29,17 @@ const pluralize = (
 };
 
 const formatQuantity = (
-  qty: ShoppingItem['qty']
+  qty: ShoppingItem['qty'],
+  unit?: ShoppingItem['unit']
 ): string => {
-  const value = Number(qty);
+  
+  if (!qty) return '';
 
-  if (!qty || Number.isNaN(value) || value <= 1) {
-    return '';
+  if (!unit || unit === 'шт') {
+    return ` — ${qty}`;
   }
 
-  return ` — ${qty} шт.`;
+  return ` — ${qty} ${unit}`;
 };
 
 const formatDate = (date: Date): string => {
@@ -73,7 +75,7 @@ const buildListText = (
     lines.push('Нужно купить:');
 
     activeItems.forEach(item => {
-      const quantity = formatQuantity(item.qty);
+      const quantity = formatQuantity(item.qty, item.unit);
 
       lines.push(`▫️ ${item.name}${quantity}`);
     });
@@ -85,7 +87,7 @@ const buildListText = (
     lines.push('Уже куплено:');
 
     doneItems.forEach(item => {
-      const quantity = formatQuantity(item.qty);
+      const quantity = formatQuantity(item.qty, item.unit);
 
       lines.push(`✅ ${item.name}${quantity}`);
     });
