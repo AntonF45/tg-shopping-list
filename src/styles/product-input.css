@@ -115,7 +115,7 @@
 
   border-top: var(--border-width) solid var(--border);
   border-right: var(--border-width) solid var(--border);
-  border-top-right-radius: 16px;
+  border-top-right-radius: 15px;
 }
 
 /* Правый инвертированный угол */
@@ -130,7 +130,7 @@
 
   border-top: var(--border-width) solid var(--border);
   border-left: var(--border-width) solid var(--border);
-  border-top-left-radius: 16px;
+  border-top-left-radius: 15px;
 }
 
 .qty-toggle-tab:hover {
