@@ -100,6 +100,7 @@
   cursor: pointer;
   outline: none;
   -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation; /* ← Предотвращает залипание :active на мобильных */
   transition: transform 0.15s ease, background-color 0.2s ease;
 }
 
@@ -112,7 +113,7 @@
   width: 16px;
   height: 16px;
   pointer-events: none;
-
+  background: var(--surface); /* ← Фон перекрывает всё под собой */
   border-top: var(--border-width) solid var(--border);
   border-right: var(--border-width) solid var(--border);
   border-top-right-radius: 15px;
@@ -127,19 +128,29 @@
   width: 16px;
   height: 16px;
   pointer-events: none;
-
+  background: var(--surface); /* ← Фон перекрывает всё под собой */
   border-top: var(--border-width) solid var(--border);
   border-left: var(--border-width) solid var(--border);
   border-top-left-radius: 15px;
 }
 
 .qty-toggle-tab:hover {
-  background: var(--surface-2); /* ← ДОБАВЛЕНО: смена фона при наведении */
+  background: var(--surface-2);
+}
+
+.qty-toggle-tab:hover::before,
+.qty-toggle-tab:hover::after {
+  background: var(--surface-2);
 }
 
 .qty-toggle-tab:active {
   transform: translateX(-50%) scale(0.96);
-  background: var(--surface-2); /* ← ДОБАВЛЕНО: фон при нажатии */
+  background: var(--surface-2);
+}
+
+.qty-toggle-tab:active::before,
+.qty-toggle-tab:active::after {
+  background: var(--surface-2);
 }
 
 .qty-toggle-tab:focus-visible {
