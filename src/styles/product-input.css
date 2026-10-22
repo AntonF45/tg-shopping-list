@@ -96,9 +96,9 @@
   justify-content: center;   /* стрелка по центру */
   width: 100%;
   padding: var(--space-1) 0; /* компактная высота ~24px */
-  margin-top: calc(-1 * var(--space-1)); /* подтягиваем к верхней строке */
   border-top: var(--border-width) dashed var(--border);
   background: transparent;
+  border: none; 
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   transition: background-color 0.2s ease;
