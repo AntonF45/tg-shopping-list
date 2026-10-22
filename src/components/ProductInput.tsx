@@ -226,13 +226,22 @@ export const ProductInput: React.FC<Props> = ({
         </div>
       </div>
 
-      {/* Язычок с вырезом — ПОСЛЕДНИЙ элемент контейнера */}
+      {/* Строка-аккордеон вместо язычка */}
       <button
         type="button"
-        className="qty-toggle-tab"
+        className="qty-accordion-header"
         onClick={toggleQty}
-        aria-label={showQty ? 'Скрыть количество' : 'Показать количество'}
+        aria-expanded={showQty}
       >
+        <span className="qty-accordion-label">
+          Количество
+          {qty && (
+            <span className="qty-accordion-value">
+              — {qty} {unit}
+            </span>
+          )}
+        </span>
+
         <svg
           className={`qty-toggle-icon ${showQty ? 'qty-toggle-icon--open' : ''}`}
           width="18"

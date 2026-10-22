@@ -77,91 +77,55 @@
   box-shadow: none;
 }
 
-.qty-toggle-tab {
-  position: absolute;
-  left: 50%;
-  top: calc(100% - var(--border-width));
-  transform: translateX(-50%);
-  z-index: 2;
+.product-input-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4); /* возвращаем обычный отступ — ничего не торчит */
+  background: var(--surface);
+  padding: var(--space-3);
+  border-radius: var(--radius-lg);
+  border: var(--border-width) solid var(--border);
+  box-shadow: var(--shadow-1);
+  /* position: relative можно оставить — нужен для dropdown */
+}
 
-  width: 84px;
-  height: 30px;
-  padding: 0;
-
+.qty-accordion-header {
   display: flex;
   align-items: center;
-  justify-content: center;
-
-  background: var(--surface);
-  border: var(--border-width) solid var(--border);
-  border-top: none;
-  border-radius: 0 0 16px 16px;
-
+  justify-content: space-between;
+  gap: var(--space-2);
+  width: 100%;
+  padding: var(--space-2) var(--space-1);
+  border-top: var(--border-width) dashed var(--border);
+  background: transparent;
   cursor: pointer;
-  outline: none;
   -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
-  transition: transform 0.15s ease, background-color 0.2s ease;
+  transition: background-color 0.2s ease;
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
 }
 
-/* Левый стык: четверть круга + дуга-граница */
-.qty-toggle-tab::before {
-  content: "";
-  position: absolute;
-  top: var(--border-width);   /* точно к линии границы карточки */
-  right: 100%;
-  width: 16px;
-  height: 16px;
-  pointer-events: none;
-
-  background: var(--surface); /* зальётся только четверть круга */
-  border-left: var(--border-width) solid var(--border);
-  border-bottom: var(--border-width) solid var(--border);
-  border-bottom-left-radius: 16px; /* радиус = размеру → прямых участков нет */
-}
-
-/* Правый стык: зеркально */
-.qty-toggle-tab::after {
-  content: "";
-  position: absolute;
-  top: var(--border-width);
-  left: 100%;
-  width: 16px;
-  height: 16px;
-  pointer-events: none;
-
-  background: var(--surface);
-  border-right: var(--border-width) solid var(--border);
-  border-bottom: var(--border-width) solid var(--border);
-  border-bottom-right-radius: 16px;
-}
-
-/* Hover ТОЛЬКО для устройств с мышью — убирает залипание на тач */
-@media (hover: hover) {
-  .qty-toggle-tab:hover {
-    background: var(--surface-2);
-  }
-  .qty-toggle-tab:hover::before,
-  .qty-toggle-tab:hover::after {
-    background: var(--surface-2);
-  }
-}
-
-.qty-toggle-tab:active {
-  transform: translateX(-50%) scale(0.96);
+.qty-accordion-header:active {
   background: var(--surface-2);
 }
 
-.qty-toggle-tab:active::before,
-.qty-toggle-tab:active::after {
-  background: var(--surface-2);
+.qty-accordion-label {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--text-muted);
 }
 
-.qty-toggle-tab:focus-visible {
-  box-shadow: 0 0 0 3px var(--accent-ring);
+.qty-accordion-value {
+  color: var(--text);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
 }
 
 .qty-toggle-icon {
+  flex-shrink: 0;
   color: var(--text-muted);
   transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
