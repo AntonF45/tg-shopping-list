@@ -1,0 +1,58 @@
+/* ============================================================
+   UTILS — ВСПОМОГАТЕЛЬНЫЕ СТИЛИ
+   ============================================================ */
+
+/* Загрузка и ошибки */
+.loading,
+.error {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--bg);
+  color: var(--text-muted);
+  font-size: var(--text-base);
+}
+
+/* Адаптивность */
+@media (max-width: 360px) {
+  :root {
+    --space-3: 12px;
+  }
+
+  .list-chip {
+    min-height: var(--tap-sm);
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--text-sm);
+  }
+
+  .btn-share-island,
+  .btn-clear-island {
+    min-height: calc(var(--tap) + 4px);
+    padding: var(--space-3) var(--space-4);
+    font-size: var(--text-sm);
+  }
+}
+
+/* Доступность — уменьшенная анимация */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .recent-dropdown,
+  .qty-toggle-icon,
+  .qty-unit-block {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .toast {
+    animation: none;
+  }
+}

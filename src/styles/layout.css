@@ -1,0 +1,19 @@
+/* ============================================================
+   LAYOUT
+   ============================================================ */
+
+.app-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  max-width: 600px;
+  margin: 0 auto;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding:
+    calc(var(--space-3) + var(--safe-top))
+    calc(var(--space-3) + var(--safe-right))
+    calc(120px + var(--safe-bottom))
+    calc(var(--space-3) + var(--safe-left));
+  background: var(--bg);
+}

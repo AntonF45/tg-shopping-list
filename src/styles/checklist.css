@@ -1,0 +1,125 @@
+/* ============================================================
+   CHECKLIST — СПИСОК ТОВАРОВ
+   ============================================================ */
+
+.item-list {
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-2) var(--space-4);
+  background: var(--surface);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-1);
+}
+
+.checklist-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+  border-bottom: var(--border-width) solid var(--border);
+  animation: item-in 0.25s ease;
+}
+
+.checklist-item:last-child {
+  border-bottom: none;
+}
+
+.checklist-checkbox {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  accent-color: var(--accent-strong);
+  cursor: pointer;
+}
+
+.checklist-label {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  cursor: pointer;
+  color: var(--text);
+  transition: color 0.3s ease;
+}
+
+.checklist-label::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 100%;
+  height: 2px;
+  background: var(--danger);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.35s ease-out;
+  pointer-events: none;
+}
+
+.checklist-checkbox:checked + .checklist-label {
+  color: var(--completed-text);
+}
+
+.checklist-checkbox:checked + .checklist-label::after {
+  transform: scaleX(1);
+}
+
+.item-name {
+  font-size: var(--text-base);
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex-shrink: 1;
+}
+
+.item-qty {
+  flex-shrink: 0;
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.btn-remove-item {
+  width: var(--tap);
+  height: var(--tap);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+  opacity: 0.55;
+  transition: opacity 0.2s, background-color 0.2s, color 0.2s, transform 0.1s;
+}
+
+.btn-remove-item:active {
+  transform: scale(0.9);
+  background: var(--danger-soft);
+  color: var(--danger);
+  opacity: 1;
+}
+
+.empty-state {
+  padding: 48px var(--space-3);
+  text-align: center;
+  color: var(--text-muted);
+  background: var(--surface);
+  border: var(--border-width) dashed var(--border);
+  border-radius: var(--radius-md);
+}
+
+@keyframes item-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

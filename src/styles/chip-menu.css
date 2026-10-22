@@ -1,0 +1,71 @@
+/* ============================================================
+   CHIP MENU — МЕНЮ ЧИПСА
+   ============================================================ */
+
+.chip-menu-overlay {
+  position: fixed;
+  z-index: 1000;
+  pointer-events: none;
+  animation: menu-appear 0.18s ease-out;
+}
+
+.chip-menu {
+  position: relative;
+  display: flex;
+  gap: var(--space-2);
+  padding: var(--space-2);
+  pointer-events: auto;
+  background: var(--surface);
+  border: var(--border-width) solid var(--border);
+  border-radius: 20px;
+  box-shadow: var(--shadow-2);
+}
+
+.chip-menu::before {
+  content: '';
+  position: absolute;
+  top: -6px;
+  left: var(--arrow-left, 50%);
+  width: 12px;
+  height: 12px;
+  background: var(--surface);
+  border-left: var(--border-width) solid var(--border);
+  border-top: var(--border-width) solid var(--border);
+  transform: translateX(-50%) rotate(45deg);
+}
+
+.chip-menu-item {
+  width: var(--tap);
+  height: var(--tap);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--surface-2);
+  color: var(--text);
+  font-size: var(--text-lg);
+  transition: transform 0.15s, background-color 0.2s, color 0.2s;
+}
+
+.chip-menu-item:active {
+  transform: scale(0.94);
+}
+
+.chip-menu-item--delete {
+  color: var(--danger);
+}
+
+.chip-menu-item--delete:active {
+  background: var(--danger-soft);
+}
+
+@keyframes menu-appear {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
