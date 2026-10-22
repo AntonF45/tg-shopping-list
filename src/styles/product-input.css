@@ -112,7 +112,7 @@
   width: 16px;
   height: 16px;
   pointer-events: none;
-  background: var(--surface); /* ← ДОБАВЛЕНО: фон как у язычка */
+
   border-bottom: var(--border-width) solid var(--border);
   border-right: var(--border-width) solid var(--border);
   border-bottom-right-radius: 16px;
@@ -127,7 +127,7 @@
   width: 16px;
   height: 16px;
   pointer-events: none;
-  background: var(--surface); /* ← ДОБАВЛЕНО: фон как у язычка */
+
   border-bottom: var(--border-width) solid var(--border);
   border-left: var(--border-width) solid var(--border);
   border-bottom-left-radius: 16px;
@@ -137,20 +137,9 @@
   background: var(--surface-2); /* ← ДОБАВЛЕНО: смена фона при наведении */
 }
 
-/* При наведении меняем фон и у псевдоэлементов */
-.qty-toggle-tab:hover::before,
-.qty-toggle-tab:hover::after {
-  background: var(--surface-2);
-}
-
 .qty-toggle-tab:active {
   transform: translateX(-50%) scale(0.96);
   background: var(--surface-2); /* ← ДОБАВЛЕНО: фон при нажатии */
-}
-
-.qty-toggle-tab:active::before,
-.qty-toggle-tab:active::after {
-  background: var(--surface-2);
 }
 
 .qty-toggle-tab:focus-visible {
