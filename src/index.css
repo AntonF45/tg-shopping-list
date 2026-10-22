@@ -817,38 +817,52 @@ input {
   box-shadow: var(--shadow-1);
 }
 
-/* === ЯЗЫЧОК С ВЫРЕЗОМ === */
+.product-input-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-bottom: 40px;            /* место под выступающий язычок */
+  background: var(--surface);
+  padding: var(--space-3);
+  padding-bottom: var(--space-4);
+  border-radius: var(--radius-lg);
+  border: var(--border-width) solid var(--border);
+  box-shadow: var(--shadow-1);
+}
+
+/* === ЯЗЫЧОК: целиком снаружи карточки === */
 .qty-toggle-tab {
   position: absolute;
   left: 50%;
-  bottom: 0;
-  transform: translate(-50%, 50%);  /* Половина торчит наружу */
+  top: 100%;                      /* верхняя кромка = нижняя граница карточки */
+  transform: translateX(-50%);    /* без translateY — не заходит внутрь */
   z-index: 2;
 
-  width: 76px;
-  height: 30px;
+  width: 80px;
+  height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
 
-  background: var(--surface);       /* Перекрывает нижнюю границу карточки */
+  background: var(--surface);     /* перекрывает полосу нижней границы */
   border: var(--border-width) solid var(--border);
-  border-top: none;                 /* Сверху границы нет — сливается с карточкой */
-  border-radius: 0 0 16px 16px;     /* Скругление только снизу */
+  border-top: none;
+  border-radius: 0 0 18px 18px;   /* более плавное скругление снизу */
   cursor: pointer;
   padding: 0;
 }
 
 .qty-toggle-tab:active {
-  transform: translate(-50%, 50%) scale(0.94);
+  transform: translateX(-50%) scale(0.94);
 }
 
-/* Вогнутые стыки по бокам язычка (те самые "вырезы") */
+/* Вогнутые стыки: начинаются точно от границы карточки */
 .qty-toggle-tab::before,
 .qty-toggle-tab::after {
   content: "";
   position: absolute;
-  top: -2px;                        /* Накрывает остаток прямой границы карточки */
+  top: 0;                         /* было -2px — теперь не заходит внутрь */
   width: 12px;
   height: 14px;
   pointer-events: none;
@@ -858,9 +872,9 @@ input {
   right: 100%;
   background: radial-gradient(
     circle at 0 100%,
-    transparent 0 10px,
-    var(--border) 10px 11.5px,
-    var(--surface) 11.5px
+    transparent 0 12px,           /* радиус выреза увеличен для плавности */
+    var(--border) 12px 13.5px,
+    var(--surface) 13.5px
   );
 }
 
@@ -868,13 +882,12 @@ input {
   left: 100%;
   background: radial-gradient(
     circle at 100% 100%,
-    transparent 0 10px,
-    var(--border) 10px 11.5px,
-    var(--surface) 11.5px
+    transparent 0 12px,
+    var(--border) 12px 13.5px,
+    var(--surface) 13.5px
   );
 }
 
-/* Стрелка внутри язычка */
 .qty-toggle-icon {
   color: var(--text-muted);
   transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
