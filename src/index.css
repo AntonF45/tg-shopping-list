@@ -822,7 +822,7 @@ input {
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
-  margin-bottom: 40px;            /* место под выступающий язычок */
+  margin-bottom: 56px;            /* место под выступающий язычок */
   background: var(--surface);
   padding: var(--space-3);
   padding-bottom: var(--space-4);
@@ -835,8 +835,8 @@ input {
 .qty-toggle-tab {
   position: absolute;
   left: 50%;
-  top: 100%;                      /* верхняя кромка = нижняя граница карточки */
-  transform: translateX(-50%);    /* без translateY — не заходит внутрь */
+  top: 100%;
+  transform: translateX(-50%);
   z-index: 2;
 
   width: 80px;
@@ -845,12 +845,20 @@ input {
   align-items: center;
   justify-content: center;
 
-  background: var(--surface);     /* перекрывает полосу нижней границы */
+  background: var(--surface);
   border: var(--border-width) solid var(--border);
   border-top: none;
-  border-radius: 0 0 18px 18px;   /* более плавное скругление снизу */
+  border-radius: 0 0 18px 18px;
+  border-top-left-radius: 0;    /* ← явно убираем скругление левого верхнего угла */
+  border-top-right-radius: 0;   /* ← явно убираем скругление правого верхнего угла */
   cursor: pointer;
   padding: 0;
+  outline: none;                /* ← убираем обводку при фокусе */
+  -webkit-tap-highlight-color: transparent; /* ← убираем подсветку тапа на iOS */
+}
+
+.qty-toggle-tab:focus {
+  outline: none;                /* ← убираем обводку при фокусе клавиатурой */
 }
 
 .qty-toggle-tab:active {
