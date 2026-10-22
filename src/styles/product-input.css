@@ -90,6 +90,44 @@
   /* position: relative можно оставить — нужен для dropdown */
 }
 
+/* Отступ справа, когда в поле есть текст (чтобы не наезжал на крестик) */
+.product-name-input:not(:placeholder-shown) {
+  padding-right: 40px;
+}
+
+/* Крестик очистки */
+.btn-clear-input {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  color: var(--text-muted);
+  opacity: 0.6;
+
+  cursor: pointer;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color 0.2s, color 0.2s, opacity 0.2s, transform 0.1s;
+}
+
+.btn-clear-input:active {
+  background: var(--surface-2);
+  color: var(--text);
+  opacity: 1;
+  transform: translateY(-50%) scale(0.88);
+}
+
 .qty-accordion-header {
   display: flex;
   align-items: center;

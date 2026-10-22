@@ -68,7 +68,7 @@ const buildListText = (
   const lines: string[] = [];
 
   lines.push(`🛒 ${listTitle}`);
-  lines.push(`📅 ${formatDate(new Date())}`);
+  lines.push(`${formatDate(new Date())}`);
   lines.push('');
 
   if (activeItems.length > 0) {

@@ -64,6 +64,12 @@ export const ProductInput: React.FC<Props> = ({
     inputRef.current?.focus();
   };
 
+  const handleClearName = () => {
+  setName('');
+  setShowDropdown(true); // после очистки показываем недавние товары
+  triggerHaptic('light');
+};
+
   const incrementQty = () => {
     const num = parseFloat(qty.replace(',', '.')) || 0;
     const newQty = num + 1;
@@ -133,6 +139,31 @@ export const ProductInput: React.FC<Props> = ({
             spellCheck={true}
             enterKeyHint="done"
           />
+
+          {/* Крестик очистки — появляется только когда есть текст */}
+          {name && (
+            <button
+              type="button"
+              className="btn-clear-input"
+              onMouseDown={e => e.preventDefault()} /* не отбираем фокус у поля */
+              onClick={handleClearName}
+              aria-label="Очистить поле"
+            >
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+          )}
 
           {showDropdown && filteredItems.length > 0 && (
             <ul ref={dropdownRef} className="recent-dropdown">
