@@ -158,9 +158,15 @@ export const useShoppingList = () => {
     triggerHaptic('medium');
   }, []);
 
+  const removeRecentItem = useCallback(async (name: string) => {
+    await localStorageRepository.removeRecentItem(name);
+    setRecentItems(prev => prev.filter(item => item !== name));
+    triggerHaptic('light');
+  }, []);
+
   return {
     list, allLists, activeListId, recentItems, isLoading,
     addItem, toggleItem, removeItem, clearDone,
-    setActiveList, createList, renameList, deleteList,
+    setActiveList, createList, renameList, deleteList, removeRecentItem,
   };
 };

@@ -6,6 +6,7 @@ interface Props {
   onAdd: (name: string, qty: string, unit: Unit) => Promise<void>;
   onFocusChange?: (isFocused: boolean) => void;
   recentItems: string[];
+  onRemoveRecent?: (name: string) => void | Promise<void>;
 }
 
 const UNITS: Unit[] = ['шт', 'кг', 'г', 'л', 'мл', 'уп', 'пач'];
@@ -14,6 +15,7 @@ export const ProductInput: React.FC<Props> = ({
   onAdd,
   onFocusChange,
   recentItems,
+  onRemoveRecent,
 }) => {
   const [name, setName] = useState('');
   const [qty, setQty] = useState('');
@@ -176,7 +178,36 @@ export const ProductInput: React.FC<Props> = ({
                     handleSelect(item);
                   }}
                 >
-                  {item}
+                  <span className="recent-dropdown-name">{item}</span>
+
+                  {/* Крестик удаления из памяти подсказок */}
+                  <button
+                    type="button"
+                    className="btn-remove-recent"
+                    onMouseDown={e => {
+                      e.preventDefault();
+                      e.stopPropagation(); // не выбираем товар при клике на крестик
+                    }}
+                    onClick={e => {
+                      e.stopPropagation();
+                      onRemoveRecent?.(item);
+                    }}
+                    aria-label={`Удалить «${item}» из подсказок`}
+                  >
+                    <svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <line x1="18" y1="6" x2="6" y2="18" />
+                      <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                  </button>
                 </li>
               ))}
             </ul>

@@ -21,6 +21,7 @@ export interface ShoppingListRepository {
   getList(): Promise<ShoppingList>;
   getRecentItems(): Promise<string[]>;
   addRecentItem(name: string): Promise<void>;
+  removeRecentItem(name: string): Promise<void>;
   addItem(input: AddItemInput): Promise<AddItemResult>;
   toggleItem(id: string): Promise<ShoppingItem>;
   removeItem(id: string): Promise<void>;

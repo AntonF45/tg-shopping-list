@@ -11,7 +11,7 @@ const App: React.FC = () => {
   const {
     list, allLists, activeListId, recentItems, isLoading,
     addItem, toggleItem, removeItem, clearDone,
-    setActiveList, createList, renameList, deleteList,
+    setActiveList, createList, renameList, deleteList, removeRecentItem,
   } = useShoppingList();
 
   const [isInputFocused, setIsInputFocused] = useState(false);
@@ -70,6 +70,7 @@ const App: React.FC = () => {
           onAdd={handleAdd}
           onFocusChange={handleFocusChange}
           recentItems={recentItems}
+          onRemoveRecent={removeRecentItem}
         />
         <ItemList
           items={list.items}

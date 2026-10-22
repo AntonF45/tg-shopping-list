@@ -102,6 +102,24 @@ export const localStorageRepository: ShoppingListRepository = {
     saveRecentToStorage(filtered.slice(0, MAX_RECENT));
   },
 
+    async removeRecentItem(name: string): Promise<void> {
+    const trimmed = name.trim();
+    if (!trimmed) return;
+
+    // 1. Получаем текущий список (используем ту же функцию, что и в addRecentItem)
+    const items = getRecentFromStorage();
+
+    // 2. Фильтруем, удаляя товар. 
+    // Делаем нечувствительным к регистру (toLowerCase), точно как в addRecentItem, 
+    // чтобы "Молоко" и "молоко" считались одним и тем же товаром.
+    const filtered = items.filter(
+      (i: string) => i.toLowerCase() !== trimmed.toLowerCase()
+    );
+
+    // 3. Сохраняем обновленный список (используем ту же функцию)
+    saveRecentToStorage(filtered);
+  },
+
   async addItem(input: AddItemInput): Promise<AddItemResult> {
     const list = await storageAdapter.getList();
     const now = Math.floor(Date.now() / 1000);

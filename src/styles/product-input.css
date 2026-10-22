@@ -302,14 +302,14 @@
 }
 
 .recent-dropdown-item {
+  display: flex;               /* строка: название + крестик */
+  align-items: center;
+  gap: var(--space-2);
   padding: var(--space-2) var(--space-3);
   font-size: var(--text-base);
   color: var(--text);
   cursor: pointer;
   transition: background-color 0.15s ease;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .recent-dropdown-item:hover {
@@ -318,6 +318,39 @@
 
 .recent-dropdown-item:active {
   background: var(--accent-ring);
+}
+
+.recent-dropdown-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Крестик удаления подсказки */
+.btn-remove-recent {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text-muted);
+  opacity: 0.5;
+  cursor: pointer;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color 0.2s, color 0.2s, opacity 0.2s, transform 0.1s;
+}
+
+.btn-remove-recent:active {
+  background: var(--danger-soft);
+  color: var(--danger);
+  opacity: 1;
+  transform: scale(0.88);
 }
 
 @keyframes dropdown-in {
