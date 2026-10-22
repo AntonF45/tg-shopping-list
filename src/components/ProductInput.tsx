@@ -232,20 +232,12 @@ export const ProductInput: React.FC<Props> = ({
         className="qty-accordion-header"
         onClick={toggleQty}
         aria-expanded={showQty}
+        aria-label={showQty ? 'Скрыть количество' : 'Показать количество'}
       >
-        <span className="qty-accordion-label">
-          Количество
-          {qty && (
-            <span className="qty-accordion-value">
-              — {qty} {unit}
-            </span>
-          )}
-        </span>
-
         <svg
           className={`qty-toggle-icon ${showQty ? 'qty-toggle-icon--open' : ''}`}
-          width="18"
-          height="18"
+          width="16"
+          height="16"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
