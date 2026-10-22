@@ -804,15 +804,84 @@ input {
 
 /* === НОВЫЙ БЛОК ВВОДА ТОВАРА === */
 .product-input-container {
+  position: relative;              /* Чтобы язычок позиционировался от карточки */
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
-  margin-bottom: var(--space-4);
+  margin-bottom: var(--space-5);   /* Чуть больше, т.к. язычок торчит вниз */
   background: var(--surface);
   padding: var(--space-3);
+  padding-bottom: var(--space-4);
   border-radius: var(--radius-lg);
   border: var(--border-width) solid var(--border);
   box-shadow: var(--shadow-1);
+}
+
+/* === ЯЗЫЧОК С ВЫРЕЗОМ === */
+.qty-toggle-tab {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translate(-50%, 50%);  /* Половина торчит наружу */
+  z-index: 2;
+
+  width: 76px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: var(--surface);       /* Перекрывает нижнюю границу карточки */
+  border: var(--border-width) solid var(--border);
+  border-top: none;                 /* Сверху границы нет — сливается с карточкой */
+  border-radius: 0 0 16px 16px;     /* Скругление только снизу */
+  cursor: pointer;
+  padding: 0;
+}
+
+.qty-toggle-tab:active {
+  transform: translate(-50%, 50%) scale(0.94);
+}
+
+/* Вогнутые стыки по бокам язычка (те самые "вырезы") */
+.qty-toggle-tab::before,
+.qty-toggle-tab::after {
+  content: "";
+  position: absolute;
+  top: -2px;                        /* Накрывает остаток прямой границы карточки */
+  width: 12px;
+  height: 14px;
+  pointer-events: none;
+}
+
+.qty-toggle-tab::before {
+  right: 100%;
+  background: radial-gradient(
+    circle at 0 100%,
+    transparent 0 10px,
+    var(--border) 10px 11.5px,
+    var(--surface) 11.5px
+  );
+}
+
+.qty-toggle-tab::after {
+  left: 100%;
+  background: radial-gradient(
+    circle at 100% 100%,
+    transparent 0 10px,
+    var(--border) 10px 11.5px,
+    var(--surface) 11.5px
+  );
+}
+
+/* Стрелка внутри язычка */
+.qty-toggle-icon {
+  color: var(--text-muted);
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.qty-toggle-icon--open {
+  transform: rotate(180deg);
 }
 
 /* Верхняя строка: инпут + кнопка добавить */
@@ -928,22 +997,6 @@ input {
 }
 
 /* Кнопка-тоггл количества — только стрелка, без рамки */
-.qty-toggle {
-  align-self: center;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: transparent; /* сливается с фоном блока */
-  border: none;            /* убираем обводку */
-  border-radius: 0;
-  cursor: pointer;
-  padding: 0;
-  margin-top: -4px;        /* прижимаем к нижней границе */
-  margin-bottom: -4px;
-  transition: transform 0.15s, opacity 0.2s;
-}
 
 .qty-toggle:hover {
   background: transparent;
@@ -951,11 +1004,6 @@ input {
 
 .qty-toggle:active {
   transform: scale(0.9);
-}
-
-.qty-toggle-icon {
-  color: var(--text-muted);
-  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .qty-toggle-icon--open {
