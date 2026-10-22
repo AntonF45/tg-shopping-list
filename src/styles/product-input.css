@@ -80,62 +80,67 @@
 .qty-toggle-tab {
   position: absolute;
   left: 50%;
-  top: 100%;
+  top: calc(100% - var(--border-width));
   transform: translateX(-50%);
   z-index: 2;
-  width: 80px;
-  height: 28px;
+
+  width: 84px;
+  height: 30px;
+  padding: 0;
+
   display: flex;
   align-items: center;
   justify-content: center;
+
   background: var(--surface);
   border: var(--border-width) solid var(--border);
   border-top: none;
-  border-radius: 0 0 18px 18px;
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
+  border-radius: 0 0 16px 16px;
+
   cursor: pointer;
-  padding: 0;
   outline: none;
   -webkit-tap-highlight-color: transparent;
+  transition: transform 0.15s ease, background-color 0.2s ease;
 }
 
-.qty-toggle-tab:focus {
-  outline: none;
+/* Левый инвертированный угол (продолжение рамки) */
+.qty-toggle-tab::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 100%;
+  width: 16px;
+  height: 16px;
+  pointer-events: none;
+  border-bottom: var(--border-width) solid var(--border);
+  border-right: var(--border-width) solid var(--border);
+  border-bottom-right-radius: 16px;
 }
 
-.qty-toggle-tab:active {
-  transform: translateX(-50%) scale(0.94);
-}
-
-.qty-toggle-tab::before,
+/* Правый инвертированный угол (продолжение рамки) */
 .qty-toggle-tab::after {
   content: "";
   position: absolute;
   top: 0;
-  width: 12px;
-  height: 14px;
-  pointer-events: none;
-}
-
-.qty-toggle-tab::before {
-  right: 100%;
-  background: radial-gradient(
-    circle at 0 100%,
-    transparent 0 12px,
-    var(--border) 12px 13.5px,
-    var(--surface) 13.5px
-  );
-}
-
-.qty-toggle-tab::after {
   left: 100%;
-  background: radial-gradient(
-    circle at 100% 100%,
-    transparent 0 12px,
-    var(--border) 12px 13.5px,
-    var(--surface) 13.5px
-  );
+  width: 16px;
+  height: 16px;
+  pointer-events: none;
+  border-bottom: var(--border-width) solid var(--border);
+  border-left: var(--border-width) solid var(--border);
+  border-bottom-left-radius: 16px;
+}
+
+.qty-toggle-tab:hover {
+  background: var(--surface-2);
+}
+
+.qty-toggle-tab:active {
+  transform: translateX(-50%) scale(0.96);
+}
+
+.qty-toggle-tab:focus-visible {
+  box-shadow: 0 0 0 3px var(--accent-ring);
 }
 
 .qty-toggle-icon {
