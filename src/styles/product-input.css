@@ -100,47 +100,51 @@
   cursor: pointer;
   outline: none;
   -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation; /* ← Предотвращает залипание :active на мобильных */
+  touch-action: manipulation;
   transition: transform 0.15s ease, background-color 0.2s ease;
 }
 
-/* Левый инвертированный угол */
+/* Левый стык: четверть круга + дуга-граница */
 .qty-toggle-tab::before {
   content: "";
   position: absolute;
-  top: 0;
+  top: var(--border-width);   /* точно к линии границы карточки */
   right: 100%;
   width: 16px;
   height: 16px;
   pointer-events: none;
-  background: var(--surface); /* ← Фон перекрывает всё под собой */
-  border-top: var(--border-width) solid var(--border);
-  border-right: var(--border-width) solid var(--border);
-  border-top-right-radius: 15px;
+
+  background: var(--surface); /* зальётся только четверть круга */
+  border-left: var(--border-width) solid var(--border);
+  border-bottom: var(--border-width) solid var(--border);
+  border-bottom-left-radius: 16px; /* радиус = размеру → прямых участков нет */
 }
 
-/* Правый инвертированный угол */
+/* Правый стык: зеркально */
 .qty-toggle-tab::after {
   content: "";
   position: absolute;
-  top: 0;
+  top: var(--border-width);
   left: 100%;
   width: 16px;
   height: 16px;
   pointer-events: none;
-  background: var(--surface); /* ← Фон перекрывает всё под собой */
-  border-top: var(--border-width) solid var(--border);
-  border-left: var(--border-width) solid var(--border);
-  border-top-left-radius: 15px;
+
+  background: var(--surface);
+  border-right: var(--border-width) solid var(--border);
+  border-bottom: var(--border-width) solid var(--border);
+  border-bottom-right-radius: 16px;
 }
 
-.qty-toggle-tab:hover {
-  background: var(--surface-2);
-}
-
-.qty-toggle-tab:hover::before,
-.qty-toggle-tab:hover::after {
-  background: var(--surface-2);
+/* Hover ТОЛЬКО для устройств с мышью — убирает залипание на тач */
+@media (hover: hover) {
+  .qty-toggle-tab:hover {
+    background: var(--surface-2);
+  }
+  .qty-toggle-tab:hover::before,
+  .qty-toggle-tab:hover::after {
+    background: var(--surface-2);
+  }
 }
 
 .qty-toggle-tab:active {
