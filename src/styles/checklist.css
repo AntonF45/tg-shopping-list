@@ -123,3 +123,9 @@
     transform: translateY(0);
   }
 }
+
+.checklist-item--pressed {
+  background: var(--surface-2);
+  border-radius: var(--radius-md);
+  transition: background-color 0.1s;
+}

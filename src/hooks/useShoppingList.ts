@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
-import { ShoppingList, AddItemInput } from '../types/shopping';
 import { localStorageRepository } from '../storage/localStorageRepository';
 import { logEvent } from '../lib/analytics';
 import { triggerHaptic } from '../lib/telegram';
+import { ShoppingList, ShoppingItem, AddItemInput } from '../types/shopping';
 
 export const useShoppingList = () => {
   const [list, setList] = useState<ShoppingList | null>(null);
@@ -38,45 +38,31 @@ export const useShoppingList = () => {
         return { item: null, wasDuplicate: false };
       }
 
-      // Формируем полное имя с единицей измерения, если она указана и не 'шт'
-      
+      // 1. ПРОВЕРКА НА ДУБЛИКАТ (игнорируем регистр и пробелы по краям)
+      const isDuplicate = list?.items.some(
+        i => i.name.trim().toLowerCase() === input.name.trim().toLowerCase() && !i.isDone
+      );
 
-      const result = await localStorageRepository.addItem({
-        ...input,
-        name: input.name,
-      });
+      if (isDuplicate) {
+        triggerHaptic('heavy'); // Вибрация ошибки (или 'medium')
+        return { item: null, wasDuplicate: true }; // Возвращаем флаг, не сохраняя в БД
+      }
 
-      // Добавляем в историю (используем оригинальное имя без единицы для чистоты поиска)
+      // 2. Если не дубликат, добавляем как обычно
+      const result = await localStorageRepository.addItem(input);
       await localStorageRepository.addRecentItem(input.name);
       const updatedRecent = await localStorageRepository.getRecentItems();
       setRecentItems(updatedRecent);
 
       setList(prev => {
         if (!prev) return null;
-
-        if (result.wasDuplicate) {
-          return {
-            ...prev,
-            items: prev.items.map(i => i.id === result.item.id ? result.item : i),
-          };
-        }
-
-        const exists = prev.items.find(i => i.id === result.item.id);
-        if (exists) return prev;
-
         return { ...prev, items: [...prev.items, result.item] };
       });
 
-      triggerHaptic(result.wasDuplicate ? 'medium' : 'light');
-
-      logEvent(
-        result.wasDuplicate ? 'item_duplicate_increased' : 'item_added',
-        { hasQty: !!input.qty, totalItems: list?.items.length || 0 }
-      );
-
+      triggerHaptic('light');
       return result;
     },
-    [list?.items.length]
+    [list?.items]
   );
 
   const toggleItem = useCallback(async (id: string) => {
@@ -164,9 +150,15 @@ export const useShoppingList = () => {
     triggerHaptic('light');
   }, []);
 
+  const updateItem = useCallback(async (id: string, updates: Partial<ShoppingItem>) => {
+    const updated = await localStorageRepository.updateItem(id, updates);
+    setList(prev => prev ? { ...prev, items: prev.items.map(i => i.id === id ? updated : i) } : null);
+    triggerHaptic('light');
+  }, []);
+
   return {
     list, allLists, activeListId, recentItems, isLoading,
     addItem, toggleItem, removeItem, clearDone,
-    setActiveList, createList, renameList, deleteList, removeRecentItem,
+    setActiveList, createList, renameList, deleteList, removeRecentItem, updateItem,
   };
 };

@@ -102,21 +102,13 @@ export const localStorageRepository: ShoppingListRepository = {
     saveRecentToStorage(filtered.slice(0, MAX_RECENT));
   },
 
-    async removeRecentItem(name: string): Promise<void> {
+  async removeRecentItem(name: string): Promise<void> {
     const trimmed = name.trim();
     if (!trimmed) return;
-
-    // 1. Получаем текущий список (используем ту же функцию, что и в addRecentItem)
     const items = getRecentFromStorage();
-
-    // 2. Фильтруем, удаляя товар. 
-    // Делаем нечувствительным к регистру (toLowerCase), точно как в addRecentItem, 
-    // чтобы "Молоко" и "молоко" считались одним и тем же товаром.
     const filtered = items.filter(
       (i: string) => i.toLowerCase() !== trimmed.toLowerCase()
     );
-
-    // 3. Сохраняем обновленный список (используем ту же функцию)
     saveRecentToStorage(filtered);
   },
 
@@ -125,16 +117,14 @@ export const localStorageRepository: ShoppingListRepository = {
     const now = Math.floor(Date.now() / 1000);
     const normalizedName = input.name.toLowerCase().trim();
 
+    // Ищем дубликат только среди НЕ купленных товаров
     const existing = list.items.find(
-      (i: ShoppingItem) => i.name.toLowerCase().trim() === normalizedName
+      (i: ShoppingItem) => i.name.toLowerCase().trim() === normalizedName && !i.isDone
     );
 
     if (existing) {
-      const currentQty = parseInt(existing.qty || '0') || 0;
-      existing.qty = (currentQty + 1).toString();
-      existing.updatedAt = now;
-      list.updatedAt = now;
-      await storageAdapter.saveList(list);
+      // ИСПРАВЛЕНО: НЕ меняем количество автоматически. 
+      // Просто возвращаем wasDuplicate: true, чтобы UI показал уведомление.
       return { item: existing, wasDuplicate: true };
     }
 
@@ -191,6 +181,19 @@ export const localStorageRepository: ShoppingListRepository = {
     return item;
   },
 
+  // ИСПРАВЛЕНО: используем storageAdapter.saveList и единый формат времени
+  async updateItem(id: string, updates: Partial<ShoppingItem>): Promise<ShoppingItem> {
+    const list = await storageAdapter.getList();
+    const now = Math.floor(Date.now() / 1000);
+    
+    const updatedItems = list.items.map(item =>
+      item.id === id ? { ...item, ...updates, updatedAt: now } : item
+    );
+    
+    await storageAdapter.saveList({ ...list, items: updatedItems });
+    return updatedItems.find(i => i.id === id)!;
+  },
+  
   async getAllLists(): Promise<ShoppingListsStore> {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);

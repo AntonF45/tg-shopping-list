@@ -27,6 +27,7 @@ export interface ShoppingListRepository {
   removeItem(id: string): Promise<void>;
   clearDone(): Promise<void>;
   updateQty(id: string, qty: string): Promise<ShoppingItem>;
+  updateItem(id: string, updates: Partial<ShoppingItem>): Promise<ShoppingItem>;
   getAllLists(): Promise<ShoppingListsStore>;
   getActiveList(): Promise<ShoppingList>;
   setActiveList(id: string): Promise<void>;
