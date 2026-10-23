@@ -12,7 +12,7 @@ const UNITS: Unit[] = ['шт', 'кг', 'г', 'л', 'мл', 'уп', 'пач'];
 
 export const EditItemModal: React.FC<Props> = ({ item, onSave, onClose }) => {
   const [qty, setQty] = useState(item.qty || '');
-  const [unit, setUnit] = useState<Unit>(item.unit || 'шт');
+  const [unit, setUnit] = useState<Unit>(item.unit || '');
 
   // Закрытие по Escape (для десктопа)
   useEffect(() => {
@@ -49,7 +49,7 @@ export const EditItemModal: React.FC<Props> = ({ item, onSave, onClose }) => {
         <div className="modal-field">
           <label className="modal-label">Единица измерения</label>
           <select
-            value={unit}
+            value={unit || 'шт'}
             onChange={e => {
               setUnit(e.target.value as Unit);
               triggerHaptic('light');

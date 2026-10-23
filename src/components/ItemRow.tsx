@@ -68,9 +68,15 @@ export const ItemRow: React.FC<Props> = ({ item, onToggle, onRemove, onEdit }) =
       />
       <label htmlFor={`item-${item.id}`} className="checklist-label">
         <span className="item-name">{item.name}</span>
+        
+        {/* Надёжное отображение количества и единицы */}
         {item.qty && (
           <span className="item-qty">
-            — {item.qty}{item.unit && item.unit !== 'шт' ? ` ${item.unit}` : ''}
+            — {item.qty} 
+            {item.unit && item.unit !== 'шт' 
+              ? item.unit          // Если "л", "кг" и т.д. — показываем (будет "— 2 л")
+              : (item.unit === 'шт' ? 'шт' : '') // Если явно "шт" — показываем "шт", если пусто — ничего
+            }
           </span>
         )}
       </label>
