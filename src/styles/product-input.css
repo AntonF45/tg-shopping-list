@@ -131,16 +131,18 @@
 .qty-accordion-header {
   display: flex;
   align-items: center;
-  justify-content: center;   /* стрелка по центру */
+  justify-content: center;
   width: 100%;
-  padding: var(--space-1) 0; /* компактная высота ~24px */
-  border-top: var(--border-width) dashed var(--border);
+  height: 24px;              /* Минимальная высота для тапа */
+  padding: 0;
+  margin: -4px 0;            /* Компенсирует gap родителя (8px / 2) */
   background: transparent;
-  border: none; 
+  border: none;
   cursor: pointer;
+  outline: none;
   -webkit-tap-highlight-color: transparent;
+  border-radius: var(--radius-sm);
   transition: background-color 0.2s ease;
-  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
 }
 
 .qty-accordion-header:active {
